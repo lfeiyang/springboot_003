@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- debug可以在Eclipse的console看到Log4j2启动和加载配置文件时的打印信息 -->
+<!-- monitorInterval表示每30秒配置文件会动态加载一次 -->
+<Configuration status="OFF" monitorInterval="300">
+    <!-- 全局属性 -->
+    <Properties>
+        <property name="LOG_HOME">D:/logs</property>
+
+        <property name="FILE_NAME">fly</property>
+
+        <!-- 控制台日志格式 -->
+        <property name="CONSOLE_PATTERN">%highlight{#### %d{yyyyMMdd HH:mm:ss,SSS} | %l | %p | %m%n}{ERROR=Bright RED, WARN=Bright Yellow, INFO=Bright Green, DEBUG=Bright Cyan, TRACE=Bright White}</property>
+
+        <!-- 日志文件输出格式 -->
+        <property name="LOG_PATTERN">#### %d{yyyyMMdd HH:mm:ss,SSS} | %l | %p | %m%n</property>
+    </Properties>
+
+    <!-- 定义输出源 -->
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_PATTERN}" />
+        </Console>
+
+        <!-- 文件回滚更新机制 -->
+        <!-- 整数计数器（即%i） -->
+        <RollingFile name="InfoFile" fileName="${LOG_HOME}/info.log" filePattern="${LOG_HOME}/$${date:yyyy-MM}/info-%d{yyyy-MM-dd HH-mm}-%i.log">
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL" />
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENTY" />
+            </Filters>
+
+            <PatternLayout pattern="${LOG_PATTERN}" />
+
+            <!-- 先时间在是大小回滚更新文件 -->
+            <Policies>
+                <!-- 基于时间的触发策略 -->
+                <!-- 此参数需要与filePattern结合使用，规定了触发rollover的频率，默认值为1。假设interval为4，若filePattern的date/time pattern的最小时间粒度为小时(如yyyy-MM-dd HH)，则每4小时触发一次rollover；若filePattern的date/time pattern的最小时间粒度为分钟(如yyyy-MM-dd HH-mm)，则每4分钟触发一次rollover。 -->
+                <TimeBasedTriggeringPolicy interval="1" />
+
+                <!-- 基于文件大小的触发策略 -->
+                <SizeBasedTriggeringPolicy size="10 KB" />
+            </Policies>
+
+            <!-- rollover时的默认策略,匹配上只会保留20个文件，否则每分钟保留20个文件 -->
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${LOG_HOME}" maxDepth="2">
+                    <IfFileName glob="*/info-*.log" />
+                    <IfLastModified age="3M" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="${LOG_HOME}/error.log" filePattern="${LOG_HOME}/$${date:yyyy-MM}/error-%d{yyyy-MM-dd HH-mm}-%i.log">
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL" />
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+
+            <PatternLayout pattern="${LOG_PATTERN}" />
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+                <SizeBasedTriggeringPolicy size="10 KB" />
+            </Policies>
+
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${LOG_HOME}" maxDepth="2">
+                    <IfFileName glob="*/error-*.log" />
+                    <IfLastModified age="3M" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="FatalFile" fileName="${LOG_HOME}/fatal.log" filePattern="${LOG_HOME}/$${date:yyyy-MM}/fatal-%d{yyyy-MM-dd HH-mm}-%i.log">
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+
+            <PatternLayout pattern="${LOG_PATTERN}" />
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+                <SizeBasedTriggeringPolicy size="10 KB" />
+            </Policies>
+
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${LOG_HOME}" maxDepth="2">
+                    <IfFileName glob="*/fatal-*.log" />
+                    <IfLastModified age="3M" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <!-- 定义打log的类型 -->
+    <Loggers>
+        <!-- additivity指示是否遵循缺省的继承机制：若是additivity设为false，则子Logger只会在自己的appender里输出，而不会在父Logger的appender里输出 -->
+        <!-- 这里additivity=true，表示会将当前的logger特性会传递给Root，即上述的效果为即会在文件中输出log，也会传递给root的控制台输出log -->
+        <!-- 这里additivity=true，会同时获取root的location信息，即root会打印日志文件，同时有位置信息 -->
+        <AsyncLogger name="com.sy" level="info" additivity="true" includeLocation="false">
+            <AppenderRef ref="InfoFile" />
+            <AppenderRef ref="ErrorFile" />
+            <AppenderRef ref="FatalFile" />
+        </AsyncLogger>
+
+        <!-- DRUID配置 -->
+        <logger name="druid.sql.Statement" level="debug" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+
+        <!-- includeLocation打印行数等具体位置信息 -->
+        <AsyncRoot level="debug" includeLocation="true">
+            <AppenderRef ref="Console" />
+        </AsyncRoot>
+    </Loggers>
+</Configuration>
