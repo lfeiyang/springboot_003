@@ -2,6 +2,8 @@ package com.sy.service;
 
 import com.sy.model.FrameUser;
 
+import java.util.List;
+
 /**
  * 用户接口
  *
@@ -10,4 +12,6 @@ import com.sy.model.FrameUser;
  */
 public interface IFrameUserService {
     FrameUser findFrameUser(String userGuid);
+
+    List<FrameUser> getFrameUserList(int first, int pageSize);
 }

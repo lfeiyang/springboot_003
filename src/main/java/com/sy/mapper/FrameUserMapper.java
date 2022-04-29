@@ -3,6 +3,8 @@ package com.sy.mapper;
 import com.sy.model.FrameUser;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 /**
  * mapper接口
  *
@@ -12,4 +14,7 @@ import org.apache.ibatis.annotations.Select;
 public interface FrameUserMapper {
     @Select("select * from frame_user where userGuid = #{userGuid}")
     public FrameUser findFrameUser(String userGuid);
+
+    @Select("select * from frame_user")
+    public List<FrameUser> getFrameUserList();
 }

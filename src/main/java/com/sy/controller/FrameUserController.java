@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 用户控制层
  *
@@ -23,5 +25,10 @@ public class FrameUserController {
     @RequestMapping("/findFrameUser")
     public FrameUser findFrameUser(@RequestParam(value = "userGuid", required = false, defaultValue = "0001c750-01d0-400f-bf56-18f66669b3a7") String userGuid) {
         return userService.findFrameUser(userGuid);
+    }
+
+    @RequestMapping("/getFrameUserList")
+    public List<FrameUser> getFrameUserList(@RequestParam(defaultValue = "1") int first, @RequestParam(defaultValue = "10") int pageSize) {
+        return userService.getFrameUserList(first, pageSize);
     }
 }
