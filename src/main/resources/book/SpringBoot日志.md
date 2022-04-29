@@ -32,6 +32,7 @@ private static final Logger LOG = LoggerFactory.getLogger(xx.class);
 
 ```properties
 // 优先级name > path，默认spring.log
+// 相对工程路径或绝对路径
 logging.file.path = 
 logging.file.name = 
 ```

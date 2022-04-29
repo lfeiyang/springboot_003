@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SpringBootStarter {
     @RequestMapping("/")
     String home() {
-
         return "Hello World!";
     }
 
