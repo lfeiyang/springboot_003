@@ -55,6 +55,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!--3.默认Json解析方案-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+            <version>2.6.7</version>
+        </dependency>
         <!--=======================================结束SpringBoot=================================================-->
 
 
@@ -127,16 +133,6 @@
             <version>3.4.2</version>
         </dependency>
         <!--=======================================结束日志系统=================================================-->
-
-
-        <!--=======================================开始其他=================================================-->
-        <!-- 1.数据绑定包 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.13.2.2</version>
-        </dependency>
-        <!--=======================================结束其他=================================================-->
     </dependencies>
 
     <build>
