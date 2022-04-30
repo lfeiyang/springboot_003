@@ -27,6 +27,11 @@ public class FrameUserController {
         return userService.findFrameUser(userGuid);
     }
 
+    @RequestMapping("/getSimpleFrameUserList")
+    public List<FrameUser> getSimpleFrameUserList(@RequestParam(defaultValue = "1") int first, @RequestParam(defaultValue = "10") int pageSize) {
+        return userService.getSimpleFrameUserList(first, pageSize);
+    }
+
     @RequestMapping("/getFrameUserList")
     public List<FrameUser> getFrameUserList(@RequestParam(defaultValue = "1") int first, @RequestParam(defaultValue = "10") int pageSize) {
         return userService.getFrameUserList(first, pageSize);
