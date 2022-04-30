@@ -13,6 +13,8 @@ import java.util.List;
 public interface IFrameUserService {
     FrameUser findFrameUser(String userGuid);
 
+    int updateFrameUser(FrameUser frameUser);
+
     List<FrameUser> getSimpleFrameUserList(int first, int pageSize);
 
     List<FrameUser> getFrameUserList(int first, int pageSize);

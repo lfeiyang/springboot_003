@@ -29,6 +29,11 @@ public class FrameUserService implements IFrameUserService {
     }
 
     @Override
+    public int updateFrameUser(FrameUser frameUser) {
+        return userMapper.update(frameUser);
+    }
+
+    @Override
     public List<FrameUser> getSimpleFrameUserList(int first, int pageSize) {
         // 紧跟着的第一个select方法会被分页
         PageHelper.startPage(first, pageSize);
