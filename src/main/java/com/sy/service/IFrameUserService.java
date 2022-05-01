@@ -10,7 +10,7 @@ import java.util.List;
  * @author lfeiyang
  * @since 2022-04-25 21:06
  */
-public interface IFrameUserService {
+public interface IFrameUserService extends IService<FrameUser> {
     FrameUser findFrameUser(String userGuid);
 
     int updateFrameUser(FrameUser frameUser);

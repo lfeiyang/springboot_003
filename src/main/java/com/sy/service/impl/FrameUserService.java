@@ -7,6 +7,7 @@ import com.sy.model.FrameUser;
 import com.sy.service.IFrameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,8 +19,8 @@ import java.util.List;
  * @since 2022-04-25 21:06
  */
 @Service
-@Transactional(readOnly = true)
-public class FrameUserService implements IFrameUserService {
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
+public class FrameUserService extends BaseService<FrameUser> implements IFrameUserService {
     @Autowired
     private FrameUserMapper userMapper;
 
@@ -29,6 +30,7 @@ public class FrameUserService implements IFrameUserService {
     }
 
     @Override
+    @Transactional
     public int updateFrameUser(FrameUser frameUser) {
         return userMapper.update(frameUser);
     }
