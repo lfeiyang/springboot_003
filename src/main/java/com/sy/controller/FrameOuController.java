@@ -26,6 +26,7 @@ public class FrameOuController {
 
     @RequestMapping("/selectByKey")
     public FrameOu selectByKey(@RequestParam String key) {
+        System.out.println("1");
         return ouService.selectByKey(key);
     }
 
