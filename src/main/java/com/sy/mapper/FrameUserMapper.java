@@ -3,6 +3,7 @@ package com.sy.mapper;
 import com.sy.model.FrameUser;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * @author lfeiyang
  * @since 2022-04-25 20:25
  */
-public interface FrameUserMapper {
+public interface FrameUserMapper extends Mapper<FrameUser> {
     @Select("select * from frame_user where userGuid = #{userGuid}")
     public FrameUser findFrameUser(String userGuid);
 

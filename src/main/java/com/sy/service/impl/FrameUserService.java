@@ -19,7 +19,6 @@ import java.util.List;
  * @since 2022-04-25 21:06
  */
 @Service
-@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class FrameUserService extends BaseService<FrameUser> implements IFrameUserService {
     @Autowired
     private FrameUserMapper userMapper;
