@@ -3,7 +3,7 @@ package com.sy.job.thread;
 import com.sy.model.FrameUser;
 import com.sy.service.impl.FrameUserService;
 import com.sy.util.RedisCatchUtil;
-import com.sy.util.SpringUtils;
+import com.sy.util.SpringUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -15,9 +15,9 @@ import java.util.List;
  * @since 2022-05-03 1:39
  */
 public class FrameUserRedisThread implements Runnable {
-    private final RedisCatchUtil redisCatchUtil = SpringUtils.getBean("redisCatchUtil");
+    private final RedisCatchUtil redisCatchUtil = SpringUtil.getBean("redisCatchUtil");
 
-    private final FrameUserService frameUserService = SpringUtils.getBean("frameUserService");
+    private final FrameUserService frameUserService = SpringUtil.getBean("frameUserService");
 
     private int first = 0;
 
