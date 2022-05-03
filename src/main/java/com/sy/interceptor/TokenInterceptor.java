@@ -56,7 +56,6 @@ public class TokenInterceptor implements HandlerInterceptor {
     private boolean handleToken(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (redisCatchUtil.hasKey(request.getRequestURI() + request.getParameter("token_value"))) {
             //当大量高并发下所有带token参数的请求进来时，进行分布式锁定,允许某一台服务器的一个线程进入，锁定时间3分钟
-            // TODO 这快有bug，记得改
             if (redisCatchUtil.addDistributedKey(request.getParameter("token_value"), request.getParameter("token_value"), 180)) {
                 //当请求的url与token与redis中的存储相同时
                 if (redisCatchUtil.get(request.getRequestURI() + request.getParameter("token_value")).equals(request.getParameter("token_value"))) {

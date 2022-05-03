@@ -1,12 +1,12 @@
 package com.sy.util;
 
+import com.sy.service.RedisFunction;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.params.SetParams;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -650,6 +650,22 @@ public class RedisCatchUtil {
         }
     }
 
+    public <T> T execute(RedisFunction<T, Jedis> fun) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return (T) fun.callback(jedis);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
+        }
+
+        return null;
+    }
+
     /**
      * 加放分布式锁
      *
@@ -659,11 +675,7 @@ public class RedisCatchUtil {
      * @return boolean
      **/
     public boolean addDistributedKey(String lockKey, String value, int expireTime) {
-        Jedis jedis = jedisPool.getResource();
-
-        SetParams setParams = SetParams.setParams();
-        setParams.nx().ex((int) expireTime);
-        return jedis.set(lockKey, value, setParams) != null;
+        return set(lockKey, value, expireTime);
     }
 
     /**
