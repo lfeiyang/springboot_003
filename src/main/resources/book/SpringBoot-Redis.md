@@ -42,6 +42,8 @@ else
 end
 ```
 
+
+
 #### <font face=幼圆 color=white>1.2.2.锁误解除</font>
 
 ```lua
@@ -51,6 +53,16 @@ else
     return 0
 end
 ```
+
+
+
+#### <font face=幼圆 color=white>1.2.3.超时解锁导致并发</font>
+
+```text
+将过期时间设置足够长，确保代码逻辑在锁释放之前能够执行完成
+```
+
+
 
 ### <font face=幼圆 color=white>1.3.测试</font>
 
