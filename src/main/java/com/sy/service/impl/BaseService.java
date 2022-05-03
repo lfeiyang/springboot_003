@@ -62,6 +62,11 @@ public abstract class BaseService<T> implements IService<T> {
     }
 
     @Override
+    public int selectAllCount(T entity) {
+        return mapper.selectCount(entity);
+    }
+
+    @Override
     public List<T> selectAll() {
         return mapper.selectAll();
     }

@@ -2,6 +2,7 @@ package com.sy.model;
 
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -14,7 +15,10 @@ import java.io.Serializable;
 @Data
 @Table(name = "frame_user")
 public class FrameUser implements Serializable {
+    @Column(name = "userGuid")
     private String userGuid;
+    @Column(name = "loginId")
     private String loginId;
+    @Column(name = "displayName")
     private String displayName;
 }

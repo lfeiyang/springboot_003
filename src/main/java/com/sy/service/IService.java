@@ -24,6 +24,8 @@ public interface IService<T> {
 
     int batchDelete(List<String> list, String property, Class<T> clazz);
 
+    int selectAllCount(T entity);
+
     List<T> selectAll();
 
     List<T> selectByExample(Object example);

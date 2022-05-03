@@ -445,3 +445,29 @@ java.lang.NoSuchMethodException: tk.mybatis.mapper.provider.base.BaseSelectProvi
 # 解决方案：将红框里的换成  
 import tk.mybatis.spring.annotation.MapperScan;
 ```
+
+### <font face=幼圆 color=white>3.驼峰命名查询自动转下划线问题</font>
+
+#### <font face=幼圆 color=white>3.1.application.properties关闭自动驼峰命名</font>
+
+```properties
+#不开启开启驼峰命名
+mybatis.configuration.map-underscore-to-camel-case=false
+```
+
+#### <font face=幼圆 color=white>3.2.Mapper的xml配置文件</font>
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sy.mapper.FrameUserMapper">
+    <resultMap id="BaseResultMap" type="com.sy.model.FrameUser">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="userGuid" jdbcType="VARCHAR" property="userGuid"/>
+        <result column="loginId" jdbcType="VARCHAR" property="loginId"/>
+        <result column="displayName" jdbcType="VARCHAR" property="displayName"/>
+    </resultMap>
+</mapper>
+```

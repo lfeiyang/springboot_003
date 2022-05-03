@@ -18,4 +18,6 @@ public interface IFrameUserService extends IService<FrameUser> {
     List<FrameUser> getSimpleFrameUserList(int first, int pageSize);
 
     List<FrameUser> getFrameUserList(int first, int pageSize);
+
+    List<FrameUser> getLocalFrameUserList(int first, int pageSize);
 }

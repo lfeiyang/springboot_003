@@ -5,9 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.sy.mapper.FrameUserMapper;
 import com.sy.model.FrameUser;
 import com.sy.service.IFrameUserService;
+import com.sy.util.RedisCatchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,11 +22,26 @@ import java.util.List;
 @Service
 public class FrameUserService extends BaseService<FrameUser> implements IFrameUserService {
     @Autowired
+    private RedisCatchUtil redisCatchUtil;
+
+    @Autowired
     private FrameUserMapper userMapper;
 
     @Override
     public FrameUser findFrameUser(String userGuid) {
-        return userMapper.findFrameUser(userGuid);
+        // 缓存
+        FrameUser frameUser = (FrameUser) redisCatchUtil.get(userGuid);
+        if (frameUser != null) {
+            return frameUser;
+        }
+
+        // 加入缓存
+        FrameUser dbUser = userMapper.findFrameUser(userGuid);
+        if (dbUser != null) {
+            redisCatchUtil.setNx(userGuid, dbUser);
+        }
+
+        return dbUser;
     }
 
     @Override
@@ -35,8 +51,11 @@ public class FrameUserService extends BaseService<FrameUser> implements IFrameUs
     }
 
     @Override
+    @Async
     public List<FrameUser> getSimpleFrameUserList(int first, int pageSize) {
         // 紧跟着的第一个select方法会被分页
+        System.out.println("first============>" + first + "; pageSize===============>" + pageSize);
+
         PageHelper.startPage(first, pageSize);
 
         return userMapper.getFrameUserList();
@@ -51,5 +70,10 @@ public class FrameUserService extends BaseService<FrameUser> implements IFrameUs
         PageInfo<FrameUser> frameUserPageInfo = new PageInfo<>(frameUserList);
 
         return frameUserPageInfo.getList();
+    }
+
+    @Override
+    public List<FrameUser> getLocalFrameUserList(int first, int pageSize) {
+        return userMapper.getLocalFrameUserList(first, pageSize);
     }
 }

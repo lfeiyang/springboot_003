@@ -68,3 +68,11 @@ public List<FrameUser> getFrameUserList(@RequestParam(defaultValue = "1") int fi
 }
 ```
 
+## <font face=幼圆 color=white>五、线程池问题</font>
+
+```java
+# 线程池中分页会出现数据错乱，线程间分页数据混用问题，切记误用，自己写个分页语句吧
+@Select("select * from frame_user limit #{first},#{pageSize}")
+ public List<FrameUser> getLocalFrameUserList(int first, int pageSize);
+```
+
