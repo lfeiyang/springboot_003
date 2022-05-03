@@ -134,3 +134,64 @@ public class LuaTest {
 }
 ```
 
+## <font face=幼圆 color=white>二、计数器</font>
+
+### <font face=幼圆 color=white>2.1.限流</font>
+
+#### <font face=幼圆 color=white>2.1.1.场景</font>
+
+```text
+日常的开放平台API一般常有限流，利用redis的incr命令可以实现一般的限流操作。
+如限制某接口每分钟请求次数上限1000次
+```
+
+
+
+#### <font face=幼圆 color=white>2.1.2.实现</font>
+
+```java
+public boolean limitFlow(String key, Long expireMillis) {
+    long incr = redisCatchUtil.incr(key, 1);
+    if (incr == 1) {
+        redisCatchUtil.expire(key, expireMillis);
+    }
+
+
+    System.out.println("60s内第" + incr + "次访问");
+
+    if (incr > 1000) {
+        return Boolean.TRUE;
+    }
+
+    return Boolean.FALSE;
+}
+```
+
+### <font face=幼圆 color=white>2.2.幂等</font>
+
+#### <font face=幼圆 color=white>2.2.1.场景</font>
+
+```text
+MQ防止重复消费也可以利用INCR命令实现，如订单防重，订单5分钟之内只能被消费一次，订单号
+作为redis的key
+```
+
+
+
+#### <font face=幼圆 color=white>2.2.2.实现</font>
+
+```java
+public boolean barrier(String key, Long expireMillis) {
+    long incr = redisCatchUtil.incr(key, 1);
+    if (incr == 1) {
+        redisCatchUtil.expire(key, expireMillis);
+    }
+
+    if (incr > 1) {
+        return Boolean.TRUE;
+    }
+
+    return Boolean.FALSE;
+}
+```
+

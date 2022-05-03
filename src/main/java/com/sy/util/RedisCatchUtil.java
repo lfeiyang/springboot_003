@@ -4,12 +4,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.params.SetParams;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisCatchUtil {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private JedisPool jedisPool;
 
     /**
      * 查找匹配的键集合
@@ -645,6 +648,37 @@ public class RedisCatchUtil {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    /**
+     * 加放分布式锁
+     *
+     * @param lockKey    键
+     * @param value      值
+     * @param expireTime 过期时间
+     * @return boolean
+     **/
+    public boolean addDistributedKey(String lockKey, String value, int expireTime) {
+        Jedis jedis = jedisPool.getResource();
+
+        SetParams setParams = SetParams.setParams();
+        setParams.nx().ex((int) expireTime);
+        return jedis.set(lockKey, value, setParams) != null;
+    }
+
+    /**
+     * 释放分布式锁
+     *
+     * @param lockKey 键
+     * @param value   值
+     * @return boolean
+     **/
+    public boolean delDistributedKey(String lockKey, String value) {
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+
+        Jedis jedis = jedisPool.getResource();
+
+        return jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(value)) != null;
     }
 
 }

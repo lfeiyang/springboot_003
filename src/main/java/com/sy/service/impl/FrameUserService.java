@@ -7,7 +7,6 @@ import com.sy.model.FrameUser;
 import com.sy.service.IFrameUserService;
 import com.sy.util.RedisCatchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,11 +50,8 @@ public class FrameUserService extends BaseService<FrameUser> implements IFrameUs
     }
 
     @Override
-    @Async
     public List<FrameUser> getSimpleFrameUserList(int first, int pageSize) {
         // 紧跟着的第一个select方法会被分页
-        System.out.println("first============>" + first + "; pageSize===============>" + pageSize);
-
         PageHelper.startPage(first, pageSize);
 
         return userMapper.getFrameUserList();
