@@ -1,6 +1,5 @@
 package com.sy.util;
 
-import com.sy.service.RedisFunction;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -648,22 +647,6 @@ public class RedisCatchUtil {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    public <T> T execute(RedisFunction<T, Jedis> fun) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
-            return (T) fun.callback(jedis);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (jedis != null) {
-                jedis.close();
-            }
-        }
-
-        return null;
     }
 
     /**
