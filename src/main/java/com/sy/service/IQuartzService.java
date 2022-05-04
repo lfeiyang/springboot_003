@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Quartz增删改查模板接口类
+ * 通过程序动态对定时任务进行增删改查接口类
  *
  * @author lfeiyang
  * @since 2022-05-04 21:55

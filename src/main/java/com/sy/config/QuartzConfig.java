@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * QuartzConfig配置类
+ * 简单的通过配置文件设定的定时任务
  *
  * @author lfeiyang
  * @since 2022-05-04 23:38

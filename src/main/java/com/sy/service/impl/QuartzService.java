@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
- * Quartz增删改查模板接口实现类
+ * 通过程序动态对定时任务进行增删改查接口实现类
  *
  * @author lfeiyang
  * @since 2022-05-04 22:08
