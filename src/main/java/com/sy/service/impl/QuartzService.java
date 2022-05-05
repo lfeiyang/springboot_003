@@ -47,7 +47,7 @@ public class QuartzService implements IQuartzService {
     public void addJob(Class<? extends QuartzJobBean> jobClass, String jobName, String jobGroupName, int jobTime, int jobTimes, Map<? extends String, ?> jobData) {
         try {
             // 任务名称和组构成任务key
-            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
+            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).storeDurably().build();
 
             // 设置job参数
             if (jobData != null && jobData.size() > 0) {
