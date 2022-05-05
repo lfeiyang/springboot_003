@@ -6,6 +6,7 @@ import com.sy.service.IFrameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
 import tk.mybatis.spring.annotation.MapperScan;
 
 import java.util.concurrent.ExecutorService;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
 // 扫描包（不然要和其它包在同层级，否则扫描不到）
 @SpringBootApplication(scanBasePackages = "com.sy")
 @MapperScan(value = {"com.sy.mapper"})
+@ImportResource(locations = {"classpath:quartz-data.xml"})
 public class SpringConfig implements CommandLineRunner {
     /**
      * 默认10个线程

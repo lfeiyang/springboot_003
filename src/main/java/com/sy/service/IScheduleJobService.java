@@ -18,7 +18,7 @@ public interface IScheduleJobService {
     void scheduleJob2() throws Exception;
 
     /**
-     * job1定时任务
+     * job1定时持久化任务
      */
     void job1() throws Exception;
 }

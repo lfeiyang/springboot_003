@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--<bean id="quartzDataXmlJob2" class="com.sy.job.QuartzDataXmlJob2"/>-->
+
+    <!--  配置調度工廠，訂製任務列表 -->
+    <bean id="springJobSchedulerFactoryBean"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <!--这块放触发器的列表-->
+                <ref bean="cronTrigger1"/>
+                <!--<ref bean="cronTrigger2"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置trigger觸發器 -->
+    <bean id="cronTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- jobDetail -->
+        <property name="jobDetail" ref="springQtzJobMethod"/>
+        <!-- cron表達式，執行時間 每5秒鐘執行一次 -->
+        <property name="cronExpression" value="0 0/2 * * * ?"/>
+    </bean>
+
+    <!-- 推荐 -->
+    <!-- 配置Job類 -->
+    <!-- 配置JobDetail -->
+    <bean id="springQtzJobMethod" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 執行目標job -->
+        <property name="targetObject" ref="quartzDataXmlJob"/>
+        <!-- 要執行的方法 -->
+        <property name="targetMethod" value="execute"/>
+
+        <!--配置爲false不允許任務併發執行-->
+        <property name="concurrent" value="false"/>
+    </bean>
+
+    <!-- 配置JobDetail -->
+    <!-- 这个需要集成QuartzBean，不推荐 -->
+    <!--<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.sy.job.QuartzDataXmlJob"/>
+        <property name="durability" value="true"/>
+    </bean>-->
+</beans>

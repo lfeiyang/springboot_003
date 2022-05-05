@@ -914,3 +914,121 @@ schedule.cron.withJob1=0 0/2 * * * ?
 schedule.cron.withJob2=0 0/2 * * * ?
 ```
 
+## <font face=幼圆 color=white>四、XML方式定时任务</font>
+
+### <font face=幼圆 color=white>4.1.Job类</font>
+
+```java
+package com.sy.job;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * xml配置定时任务（无需集成任何接口或实现类）
+ *
+ * @author lfeiyang
+ * @since 2022-05-06 1:45
+ */
+@Slf4j
+@Component
+public class QuartzDataXmlJob {
+    public void execute() {
+        log.info("quartzDataXmlJob");
+    }
+}
+```
+
+
+
+### <font face=幼圆 color=white>4.2.XML配置文件</font>
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--<bean id="quartzDataXmlJob2" class="com.sy.job.QuartzDataXmlJob2"/>-->
+
+    <!--  配置調度工廠，訂製任務列表 -->
+    <bean id="springJobSchedulerFactoryBean"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <!--这块放触发器的列表-->
+                <ref bean="cronTrigger1"/>
+                <!--<ref bean="cronTrigger2"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置trigger觸發器 -->
+    <bean id="cronTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- jobDetail -->
+        <property name="jobDetail" ref="springQtzJobMethod"/>
+        <!-- cron表達式，執行時間 每5秒鐘執行一次 -->
+        <property name="cronExpression" value="0 0/2 * * * ?"/>
+    </bean>
+
+    <!-- 推荐 -->
+    <!-- 配置Job類 -->
+    <!-- 配置JobDetail -->
+    <bean id="springQtzJobMethod" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 執行目標job -->
+        <property name="targetObject" ref="quartzDataXmlJob"/>
+        <!-- 要執行的方法 -->
+        <property name="targetMethod" value="execute"/>
+
+        <!--配置爲false不允許任務併發執行-->
+        <property name="concurrent" value="false"/>
+    </bean>
+
+    <!-- 配置JobDetail -->
+    <!-- 这个需要集成QuartzBean，不推荐 -->
+    <!--<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.sy.job.QuartzDataXmlJob"/>
+        <property name="durability" value="true"/>
+    </bean>-->
+</beans>
+```
+
+### <font face=幼圆 color=white>4.3.导入XML配置文件</font>
+
+<font face=幼圆 color=red>**@ImportResource：通过locations属性加载对应的xml配置文件，同时需要配合@Configuration注解一起使用，定义为配置类**</font>
+
+```java
+package com.sy.config;
+
+import com.sy.job.thread.FrameUserRedisThread;
+import com.sy.model.FrameUser;
+import com.sy.service.IFrameUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
+import tk.mybatis.spring.annotation.MapperScan;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * 配置类
+ *
+ * @author lfeiyang
+ * @since 2022-04-23 21:53
+ */
+@SpringBootApplication // 必须要有，底层有@Configuration注解，@ImportResource才有用
+@ImportResource(locations = {"classpath:quartz-data.xml"})
+public class SpringConfig implements CommandLineRunner {
+	
+}
+```
+
+### <font face=幼圆 color=white>4.4.并发问题</font>
+
+```text
+二、三的配置方式都会失效，不运行
+```
+
