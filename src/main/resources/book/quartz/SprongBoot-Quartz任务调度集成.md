@@ -120,6 +120,25 @@ schedulerStd.scheduleJob(jobDetail, trigger);
 schedulerStd.start();
 ```
 
+### <font face=幼圆 color=white>1.4.依赖引用</font>
+
+```java
+<!-- 6.任务调度 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-quartz</artifactId>
+</dependency>
+    
+<!-- 2.增强文档 -->
+<dependency>
+    <groupId>com.github.xiaoymin</groupId>
+    <artifactId>knife4j-spring-boot-starter</artifactId>
+    <version>3.0.3</version>
+</dependency>
+```
+
+
+
 ## <font face=幼圆 color=white>二、简单通过配置设置定时任务</font>
 
 ### <font face=幼圆 color=white>2.1.任务类</font>
