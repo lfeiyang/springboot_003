@@ -1,6 +1,7 @@
 package com.sy.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -13,6 +14,7 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @author lfeiyang
  * @since 2022-05-06 0:13
  */
+@Configuration
 public class Knife4jConfig {
     @Bean(value = "defaultApi2")
     public Docket defaultApi2() {
