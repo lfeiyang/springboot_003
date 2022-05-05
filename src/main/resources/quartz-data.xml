@@ -4,8 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <!--<bean id="quartzDataXmlJob2" class="com.sy.job.QuartzDataXmlJob2"/>-->
-
     <!--  配置調度工廠，訂製任務列表 -->
     <bean id="springJobSchedulerFactoryBean"
           class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -28,7 +26,7 @@
 
     <!-- 推荐 -->
     <!-- 配置Job類 -->
-    <!-- 配置JobDetail -->
+    <!-- 配置JobDetail，不需要集成任何类或实现接口 -->
     <bean id="springQtzJobMethod" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <!-- 執行目標job -->
         <property name="targetObject" ref="quartzDataXmlJob"/>
