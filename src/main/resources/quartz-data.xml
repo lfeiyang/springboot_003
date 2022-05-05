@@ -23,7 +23,7 @@
         <!-- jobDetail -->
         <property name="jobDetail" ref="springQtzJobMethod"/>
         <!-- cron表達式，執行時間 每5秒鐘執行一次 -->
-        <property name="cronExpression" value="0 0/2 * * * ?"/>
+        <property name="cronExpression" value="0 0 2 1 * ?"/>
     </bean>
 
     <!-- 推荐 -->
