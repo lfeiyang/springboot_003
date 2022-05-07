@@ -86,4 +86,34 @@ public class SendMessageController {
         return "ok";
     }
 
+    @GetMapping("/TestMessageAck")
+    public String TestMessageAck() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: non-existent-exchange test message ";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+
+        rabbitTemplate.convertAndSend("non-existent-exchange", "DirectRouting", map);
+
+        return "ok";
+    }
+
+    @GetMapping("/TestMessageAck2")
+    public String TestMessageAck2() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: lonelyDirectExchange test message ";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+
+        rabbitTemplate.convertAndSend("lonelyDirectExchange", "DirectRouting", map);
+
+        return "ok";
+    }
+
 }
