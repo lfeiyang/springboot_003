@@ -22,11 +22,13 @@ public class SendMessageController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    private final String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+
     @GetMapping("/sendDirectMessage")
     public String sendDirectMessage() {
         String messageId = String.valueOf(UUID.randomUUID());
         String messageData = "direct message, hello!";
-        String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         Map<String, Object> map = new HashMap<>();
         map.put("messageId", messageId);
@@ -38,4 +40,35 @@ public class SendMessageController {
 
         return "ok";
     }
+
+    @GetMapping("/sendTopicMessageMan")
+    public String sendTopicMessageMan() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: M A N ";
+
+        Map<String, Object> manMap = new HashMap<>();
+        manMap.put("messageId", messageId);
+        manMap.put("messageData", messageData);
+        manMap.put("createTime", createTime);
+
+        rabbitTemplate.convertAndSend("topicExchange", "topic.man", manMap);
+
+        return "ok";
+    }
+
+    @GetMapping("/sendTopicMessageWoman")
+    public String sendTopicMessageWoman() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: woman is all ";
+
+        Map<String, Object> womanMap = new HashMap<>();
+        womanMap.put("messageId", messageId);
+        womanMap.put("messageData", messageData);
+        womanMap.put("createTime", createTime);
+
+        rabbitTemplate.convertAndSend("topicExchange", "topic.woman", womanMap);
+
+        return "ok";
+    }
+
 }
