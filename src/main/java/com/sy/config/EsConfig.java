@@ -39,7 +39,10 @@ public class EsConfig {
 
     @Bean
     public RestHighLevelClient restHighLevelClient() {
+        // 凭证提供者
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+        // 这块是elasticsearch的账户和密码（elastic）
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, authenticationPassword));
 
         RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, SCHEME)).
