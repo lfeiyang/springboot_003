@@ -119,7 +119,44 @@ elasticsearch.hosts: ["http://192.168.58.100:9200"]
 
 ## <font face=幼圆 color=white>三、 [Java High Level REST Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.4/java-rest-high.html)</font>
 
-### <font face=幼圆 color=white>3.1.实例</font>
+### <font face=幼圆 color=white>3.1.实体</font>
+
+<font face=幼圆 color=white>Kibana提供的`Dev Tools`里边执行</font>
+
+```java
+PUT _template/hero_template
+{
+    "index_patterns":[
+        "hero*"
+    ],
+    "mappings":{
+        "properties":{
+            "@timestamp":{
+                "type":"date"
+            },
+            "id":{
+                "type":"integer"
+            },
+            "name":{
+                "type":"keyword"
+            },
+            "country":{
+                "type":"keyword"
+            },
+            "birthday":{
+                "type":"keyword"
+            },
+            "longevity":{
+                "type":"integer"
+            }
+        }
+    }
+}
+```
+
+
+
+### <font face=幼圆 color=white>3.2.实例</font>
 
 ```java
 package com.sy.controller;
