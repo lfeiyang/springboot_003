@@ -34,7 +34,7 @@ public class EsConfig {
     @Value("${elasticsearch.username:elastic}")
     public String username;
 
-    @Value("${elasticsearch.authenticationPassword:sa123456!@#}")
+    @Value("${elasticsearch.password:sa123456!@#}")
     public String authenticationPassword;
 
     @Bean
