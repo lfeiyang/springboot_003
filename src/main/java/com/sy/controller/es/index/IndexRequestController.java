@@ -42,6 +42,7 @@ public class IndexRequestController {
         String jsonString = "{" +
                 "\"user\":\"lFeiYang\"," +
                 "\"postDate\":\"2013-01-30\"," +
+                "\"count\":\"1\"," +
                 "\"message\":\"trying out Elasticsearch\"" +
                 "}";
 
