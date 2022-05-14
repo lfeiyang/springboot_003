@@ -1,4 +1,4 @@
-package com.sy.controller.es.update;
+package com.sy.controller.es.doc.update;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RequestOptions;

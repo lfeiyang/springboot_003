@@ -1,10 +1,11 @@
-package com.sy.controller.es.index;
+package com.sy.controller.es.doc.delete;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.ReindexRequest;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,26 +14,24 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 /**
- * 复制索引
+ * 查询删除
  *
  * @author lfeiyang
- * @since 2022-05-14 15:13
+ * @since 2022-05-14 18:55
  */
 @Slf4j
 @RestController
 @Scope(value = "singleton")
-public class ReIndexController {
+public class DeleteQueryRequestController {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
-    @GetMapping("/reIndex")
-    public BulkByScrollResponse reIndex() throws IOException {
-        ReindexRequest request = new ReindexRequest();
-        // 源索引
-        request.setSourceIndices("hero", "posts");
-        // 目标索引
-        request.setDestIndex("dest");
+    @GetMapping("/deleteQueryRequest")
+    public BulkByScrollResponse deleteQueryRequest() throws IOException {
+        DeleteByQueryRequest request = new DeleteByQueryRequest("dest");
+        request.setConflicts("proceed");
+        request.setQuery(new TermQueryBuilder("country", "蜀"));
 
-        return restHighLevelClient.reindex(request, RequestOptions.DEFAULT);
+        return restHighLevelClient.deleteByQuery(request, RequestOptions.DEFAULT);
     }
 }

@@ -1,4 +1,4 @@
-package com.sy.controller.es.delete;
+package com.sy.controller.es.doc.delete;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;

@@ -1,4 +1,4 @@
-package com.sy.controller.es.exists;
+package com.sy.controller.es.doc.exists;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;

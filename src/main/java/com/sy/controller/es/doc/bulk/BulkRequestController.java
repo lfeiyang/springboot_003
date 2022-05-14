@@ -1,4 +1,4 @@
-package com.sy.controller.es.bulk;
+package com.sy.controller.es.doc.bulk;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BackoffPolicy;

@@ -1,4 +1,4 @@
-package com.sy.controller.es.termvectors;
+package com.sy.controller.es.doc.termvectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RequestOptions;

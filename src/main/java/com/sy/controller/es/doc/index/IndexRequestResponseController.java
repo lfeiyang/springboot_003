@@ -1,4 +1,4 @@
-package com.sy.controller.es.index;
+package com.sy.controller.es.doc.index;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
