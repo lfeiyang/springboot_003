@@ -79,4 +79,20 @@ public class UpdateRequestController {
 
         return restHighLevelClient.update(request, RequestOptions.DEFAULT);
     }
+
+    /**
+     * 不存在会创建文档
+     *
+     * @return org.elasticsearch.action.update.UpdateResponse
+     **/
+    @GetMapping("/upserts")
+    public UpdateResponse upserts() throws IOException {
+        UpdateRequest request = new UpdateRequest("posts", "1");
+
+        String jsonString = "{\"doc\":{\"created\":\"2017-01-01\"}}";
+        request.doc(jsonString, XContentType.JSON); // 存在执行
+        request.upsert(jsonString, XContentType.JSON); // 不存在执行
+
+        return restHighLevelClient.update(request, RequestOptions.DEFAULT);
+    }
 }
