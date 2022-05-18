@@ -17,12 +17,12 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "item", indexStoreType = "docs", shards = 1, replicas = 0)
+@Document(indexName = "item", shards = 3, replicas = 1, refreshInterval = "30s")
 public class Item {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Field(type = FieldType.Text, searchAnalyzer = "ik_max_word", analyzer = "ik_smart", store = true)
     private String title; //标题
 
     @Field(type = FieldType.Keyword)

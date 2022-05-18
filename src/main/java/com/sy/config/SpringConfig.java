@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import tk.mybatis.spring.annotation.MapperScan;
 
 import java.util.concurrent.ExecutorService;
@@ -22,6 +23,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication(scanBasePackages = "com.sy")
 @MapperScan(value = {"com.sy.mapper"})
 @ImportResource(locations = {"classpath:quartz-data.xml"})
+@EnableElasticsearchRepositories("com.sy.repository")
 public class SpringConfig implements CommandLineRunner {
     /**
      * 默认10个线程
