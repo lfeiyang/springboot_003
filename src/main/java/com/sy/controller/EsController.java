@@ -1,7 +1,9 @@
 package com.sy.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.sy.config.EsConfig;
 import com.sy.model.Hero;
+import com.sy.model.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -17,7 +19,9 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -26,6 +30,8 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * es基本使用
@@ -237,5 +244,60 @@ public class EsController {
         }
 
         log.info("print info: {}, size: {}", herosList.toString(), herosList.size());
+    }
+
+    @GetMapping("/highlightQuery")
+    public List<Item> highlightQuery(String keyWords) throws IOException {
+        List<Item> items = new ArrayList<>();
+
+        //1.构建检索条件
+        SearchRequest searchRequest = new SearchRequest();
+
+        //2.指定要检索的索引库
+        searchRequest.indices("item");
+
+        //3.指定检索条件
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        sourceBuilder.query(QueryBuilders.multiMatchQuery(keyWords, "title"));
+
+        //4.结果高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.requireFieldMatch(true); //如果该属性中有多个关键字 则都高亮
+        highlightBuilder.field("title");
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+
+        sourceBuilder.highlighter(highlightBuilder);
+        searchRequest.source(sourceBuilder);
+        SearchResponse response = restHighLevelClient.search(searchRequest, EsConfig.COMMON_OPTIONS);
+        SearchHit[] hits = response.getHits().getHits();
+        for (SearchHit hit : hits) {
+            // 如果不做高亮，则可以直接转为json，然后转为对象
+            // String value = hit.getSourceAsString();
+            // ESProductTO esProductTO = JSON.parseObject(value, ESProductTO.class);
+            //解析高亮字段
+            //获取当前命中的对象的高亮的字段
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            HighlightField title = highlightFields.get("title");
+            String newName = "";
+            if (title != null) {
+                //获取该高亮字段的高亮信息
+                Text[] fragments = title.getFragments();
+                //将前缀、关键词、后缀进行拼接
+                for (Text fragment : fragments) {
+                    newName += fragment;
+                }
+            }
+
+            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+            //将高亮后的值替换掉旧值
+            sourceAsMap.put("title", newName);
+            String json = JSON.toJSONString(sourceAsMap);
+            Item item = JSON.parseObject(json, Item.class);
+            items.add(item);
+        }
+
+        return items;
     }
 }

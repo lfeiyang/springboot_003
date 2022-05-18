@@ -402,3 +402,7 @@ public class EsController {
 }
 ```
 
+
+
+## <font face=幼圆 color=white>四、 [ElasticsearchRestTemplate](https://blog.csdn.net/qq_43692950/article/details/122285770)</font>
+

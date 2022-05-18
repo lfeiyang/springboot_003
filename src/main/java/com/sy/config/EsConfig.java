@@ -5,6 +5,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -37,6 +38,13 @@ public class EsConfig {
 
     @Value("${elasticsearch.password:sa123456!@#}")
     public String authenticationPassword;
+
+    public static final RequestOptions COMMON_OPTIONS;
+
+    static {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+        COMMON_OPTIONS = builder.build();
+    }
 
     @Bean
     public RestHighLevelClient restHighLevelClient() {
