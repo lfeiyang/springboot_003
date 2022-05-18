@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @RestController
-public class ElasticsearchController {
+public class ElasticsearchRestTemplateController {
     // 对索引操作
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
