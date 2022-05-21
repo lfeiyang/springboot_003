@@ -246,6 +246,12 @@ public class EsController {
         log.info("print info: {}, size: {}", herosList.toString(), herosList.size());
     }
 
+    /**
+     * 高亮查询
+     *
+     * @param keyWords 关键词
+     * @return java.util.List<com.sy.model.Item>
+     **/
     @GetMapping("/highlightQuery")
     public List<Item> highlightQuery(String keyWords) throws IOException {
         List<Item> items = new ArrayList<>();
@@ -267,8 +273,8 @@ public class EsController {
         highlightBuilder.field("title");
         highlightBuilder.preTags("<span style='color:red'>");
         highlightBuilder.postTags("</span>");
-
         sourceBuilder.highlighter(highlightBuilder);
+
         searchRequest.source(sourceBuilder);
         SearchResponse response = restHighLevelClient.search(searchRequest, EsConfig.COMMON_OPTIONS);
         SearchHit[] hits = response.getHits().getHits();
@@ -280,19 +286,20 @@ public class EsController {
             //获取当前命中的对象的高亮的字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
             HighlightField title = highlightFields.get("title");
-            String newName = "";
+            StringBuilder newName = new StringBuilder();
             if (title != null) {
                 //获取该高亮字段的高亮信息
                 Text[] fragments = title.getFragments();
+
                 //将前缀、关键词、后缀进行拼接
                 for (Text fragment : fragments) {
-                    newName += fragment;
+                    newName.append(fragment);
                 }
             }
 
-            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
             //将高亮后的值替换掉旧值
-            sourceAsMap.put("title", newName);
+            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+            sourceAsMap.put("title", newName.toString());
             String json = JSON.toJSONString(sourceAsMap);
             Item item = JSON.parseObject(json, Item.class);
             items.add(item);
