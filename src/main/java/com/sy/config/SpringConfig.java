@@ -40,7 +40,7 @@ public class SpringConfig implements CommandLineRunner {
 
 
     /***
-     * 项目启动后立即执行的操作
+     * 项目启动后立即执行的操作（或者用@PostConstruct）
      *
      * @param args 参数
      **/
