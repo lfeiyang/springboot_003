@@ -265,7 +265,7 @@ public class EsController {
         //3.指定检索条件
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-        sourceBuilder.query(QueryBuilders.multiMatchQuery(keyWords, "title"));
+        sourceBuilder.query(QueryBuilders.multiMatchQuery(keyWords, "title").analyzer("ik_smart"));
 
         //4.结果高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();

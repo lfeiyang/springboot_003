@@ -89,10 +89,17 @@ public class ElasticsearchRestTemplateController {
     public List<Item> saveAllIndex() {
         List<Item> list = new ArrayList<>();
 
-        list.add(new Item(2L, "小米8", "手机", "小米", 3499.00, "https://image.baidu.com/13123.jpg"));
-        list.add(new Item(3L, "小米8", "手机", "小米", 3499.00, "https://image.baidu.com/13123.jpg"));
-        list.add(new Item(4L, "小米8", "手机", "小米", 3499.00, "https://image.baidu.com/13123.jpg"));
-        list.add(new Item(5L, "小米8", "手机", "小米", 3499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(12L, "这是红米的广告", "手机", "红米9", 3499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(13L, "今天没了个红米", "手机", "红米9", 3499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(14L, "你今天买红米了吗", "手机", "红米9", 4499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(15L, "红米是屌丝机", "手机", "红米9", 5499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(16L, "这个是红米9", "手机", "红米9", 6499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(17L, "我要买红米", "手机", "红米9", 7499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(18L, "你喜欢红米手机吗", "手机", "红米9", 8499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(19L, "我不喜欢红米手机", "手机", "红米9", 9499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(20L, "我这是小米手机", "手机", "红米9", 10499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(21L, "穷逼才买小米", "手机", "红米9", 11499.00, "https://image.baidu.com/13123.jpg"));
+        list.add(new Item(22L, "穷逼都不买红米", "手机", "红米9", 12499.00, "https://image.baidu.com/13123.jpg"));
 
         return (List<Item>) itemRepository.saveAll(list);
     }
@@ -132,7 +139,7 @@ public class ElasticsearchRestTemplateController {
      **/
     @GetMapping("/getPage")
     public List<Item> getPage() {
-        QueryBuilder queryBuilder = QueryBuilders.termQuery("title", "lisi");
+        QueryBuilder queryBuilder = QueryBuilders.termQuery("title", "红米");
 
         // 构建分页，page 从0开始
         Pageable pageable = PageRequest.of(0, 2);

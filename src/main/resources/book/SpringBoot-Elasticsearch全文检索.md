@@ -401,7 +401,7 @@ public class EsController {
     }
     
     /**
-     * 高亮查询
+     * 高亮查询（https://blog.csdn.net/qq_43750656/article/details/106752154）
      *
      * @param keyWords 关键词
      * @return java.util.List<com.sy.model.Item>
@@ -812,5 +812,13 @@ public class ElasticsearchRestTemplateController {
     }
 
 }
+```
+
+
+
+## <font face=幼圆 color=white>五、 [分词器](https://github.com/medcl/elasticsearch-analysis-ik)</font>
+
+```Java
+把IK分词插件集成到Elasticsearch后,在SpringBoot中集成了Elasticsearch,就有了分词功能
 ```
 
