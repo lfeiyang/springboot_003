@@ -64,7 +64,7 @@ public class EsController {
     public Long createIndex() throws IOException {
         IndexRequest request = new IndexRequest("hero");
         request.id("1");
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(100);
         map.put("id", "1");
         map.put("name", "曹操");
         map.put("country", "魏");
@@ -104,7 +104,7 @@ public class EsController {
 
     @GetMapping("/updateUser")
     public DocWriteResponse.Result updateTest() throws IOException {
-        Map<String, Object> jsonMap = new HashMap<>();
+        Map<String, Object> jsonMap = new HashMap<>(100);
         jsonMap.put("country", "魏");
 
         UpdateRequest request = new UpdateRequest("hero", "7").doc(jsonMap);
@@ -184,6 +184,7 @@ public class EsController {
                     break;
                 case DELETE:
                     DeleteResponse deleteResponse = (DeleteResponse) itemResponse;
+                default:
             }
 
             return RestStatus.OK.equals(item.status());
@@ -267,9 +268,10 @@ public class EsController {
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         sourceBuilder.query(QueryBuilders.multiMatchQuery(keyWords, "title").analyzer("ik_smart"));
 
-        //4.结果高亮
+        // 4.结果高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.requireFieldMatch(true); //如果该属性中有多个关键字 则都高亮
+        // 如果该属性中有多个关键字 则都高亮
+        highlightBuilder.requireFieldMatch(true);
         highlightBuilder.field("title");
         highlightBuilder.preTags("<span style='color:red'>");
         highlightBuilder.postTags("</span>");
@@ -282,8 +284,8 @@ public class EsController {
             // 如果不做高亮，则可以直接转为json，然后转为对象
             // String value = hit.getSourceAsString();
             // ESProductTO esProductTO = JSON.parseObject(value, ESProductTO.class);
-            //解析高亮字段
-            //获取当前命中的对象的高亮的字段
+            // 解析高亮字段
+            // 获取当前命中的对象的高亮的字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
             HighlightField title = highlightFields.get("title");
             StringBuilder newName = new StringBuilder();
