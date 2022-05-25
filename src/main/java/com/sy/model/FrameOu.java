@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 /**
  * 表名：frame_ou
+ * @author lfeiyang
  */
 @Data
 @Table(name = "frame_ou")
