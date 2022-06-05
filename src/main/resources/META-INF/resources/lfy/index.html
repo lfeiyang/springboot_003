@@ -3,10 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>首页</title>
-  <link rel="icon" href="lfy/favicon.ico" type="image/x-icon"/>
-  <link rel="bookmark" href="lfy/favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="lfy/favicon.ico">
+  <script src="lfy/common/common-js.js" type="application/javascript"></script>
 </head>
 <body>
-  <div>Hello World!</div>
+<div id="app">
+  {{ message }}
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello Vue!'
+    }
+  })
+</script>
 </body>
 </html>
