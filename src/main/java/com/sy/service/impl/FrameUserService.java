@@ -44,6 +44,11 @@ public class FrameUserService extends BaseService<FrameUser> implements IFrameUs
     }
 
     @Override
+    public FrameUser findFrameUserByLoginidAndPassWord(String loginid, String password) {
+        return userMapper.findFrameUserByLoginidAndPassWord(loginid, password);
+    }
+
+    @Override
     @Transactional
     public int updateFrameUser(FrameUser frameUser) {
         return userMapper.update(frameUser);

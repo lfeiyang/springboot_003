@@ -25,3 +25,18 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /src/main/resources/com/
+springboot_003.iml
+.idea/.gitignore
+.idea/compiler.xml
+.idea/dataSources.xml
+.idea/easyCodeTableSetting.xml
+.idea/encodings.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/uiDesigner.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/sonarlint/issuestore/index.pb
+.idea/sonarlint/issuestore/c/0/c00688672066557f5f25e9d35a3521cfdacbc51a
+.idea/sonarlint/issuestore/c/9/c90dcc99a11057d2e370d3866512e2fc791eb90e
+src/main/resources/rebel.xml

@@ -3,6 +3,39 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <profiles>
+        <profile>
+            <!-- 本地开发环境 -->
+            <id>dev</id>
+            <properties>
+                <!-- profiles.active 可以改为其他非关键字名字,env也可以,但是注意上下几个的标签要一致,本次统一使用的profiles.active-->
+                <profiles.active>dev</profiles.active>
+                <!--也可以配置其他属性,供使用;比如下面这个属性可以配置在maven打包跳过测试位置赋值 使用${skiptestconf}-->
+                <skiptestconf>false</skiptestconf>
+            </properties>
+            <activation>
+                <!-- 设置默认激活这个配置 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <!-- 发布环境 -->
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+                <skiptestconf>true</skiptestconf>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>test</id>
+            <properties>
+                <profiles.active>test</profiles.active>
+                <skiptestconf>true</skiptestconf>
+            </properties>
+        </profile>
+    </profiles>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -220,6 +253,18 @@
             <artifactId>fastjson</artifactId>
             <version>2.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.ezmorph</groupId>
+            <artifactId>ezmorph</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.2.3</version>
+            <classifier>jdk15</classifier>
+            <!-- jdk版本 -->
+        </dependency>
         <!--=======================================开始实用工具=================================================-->
     </dependencies>
 
@@ -287,6 +332,29 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <!--这里使用了profile里的属性skiptestconf-->
+                    <skipTests>${skiptestconf}</skipTests>
+                    <testFailureIgnore>${skiptestconf}</testFailureIgnore>
+                </configuration>
+            </plugin>
+
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resource</directory>
+                <!--打包时不打包我们的多个版的环境配置文件 -->
+                <excludes>
+                    <exclude>profiles/*</exclude>
+                </excludes>
+                <!-- 必要否则maven打包读取环境配置文件不生效-->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

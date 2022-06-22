@@ -19,6 +19,9 @@ public interface FrameUserMapper extends Mapper<FrameUser> {
     @Select("select * from frame_user where userGuid = #{userGuid}")
     public FrameUser findFrameUser(String userGuid);
 
+    @Select("select * from frame_user where loginId = #{loginid} and password = #{password}")
+    public FrameUser findFrameUserByLoginidAndPassWord(String loginid, String password);
+
     @Update("update user set userGuid=#{userGuid},loginId=#{loginId},displayName=#{displayName} where userGuid=#{userGuid}")
     public int update(FrameUser frameUser);
 
