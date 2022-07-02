@@ -36,12 +36,18 @@ public class LocalVariablesTest {
         count++;
     }
 
+    /***  
+     * 
+     * Slot栈帧中的局部变量表中的槽位是重复利用是重复利用的
+     **/
     public void test4() {
         int a = 0;
         {
             int b = 0;
             b = +1;
         }
+
+        // 此时的b就会复用a的槽位
         int c = a + 1;
     }
 }
