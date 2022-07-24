@@ -14,7 +14,7 @@ import java.io.IOException;
  * @since 2022-07-21 22:53
  */
 @Slf4j
-public class StringTest203 {
+public class StringTest03 {
     public static void main(String[] args) {
         BufferedReader br = null;
         try {
