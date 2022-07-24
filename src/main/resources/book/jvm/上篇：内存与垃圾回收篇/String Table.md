@@ -99,3 +99,19 @@ private final byte[] value;
 
 1. <font face=幼圆 color=white>创建了两个对象：堆空间中一个new对象 ，字符串常量池中一个字符串常量"ab"（如果此时字符串常量池中已有该常量则不会创建）</font>
 2. <font face=幼圆 color=white>字节码指令ldc在常量池创建对象</font>
+
+### <font face=幼圆 color=white>7.2、SringTable的垃圾回收</font>
+
+​		<font face=幼圆 color=white>-Xms15m -Xmx15m -XX:+PrintStringTableStatistics -XX:+PrintGcDetails</font>
+
+
+
+## <font face=幼圆 color=white>八、G1的String去重操作</font>
+
+​		<font face=幼圆 color=white>这里的去重，指的是堆的去重，而不是常量池中的，因为常量池本身就不会重复</font>
+
+1. <font face=幼圆 color=white>当垃圾收集器工作时，会访问堆上存活的对象。对每一个访问的对象都检查是否时要去重的String对象</font>
+2. <font face=幼圆 color=white>如果时，把这对象的一个引用插入到队列中等待后续的处理。一个去重的线程在后台运行，处理这个队列。处理队列的一个元素意味着从队列删除这个元素，然后尝试去重他引用的String对象</font>
+3. <font face=幼圆 color=white>使用一个hashtable记录所有被String对象使用的不重复的char数组。当去重的时候，会查这个hashtable，来看堆上是否已经存在一个一模一样的char数组</font>
+4. <font face=幼圆 color=white>如果存在，String对象会被调整引用那个数组，释放堆原来数组的引用，最终被垃圾收集器回收</font>
+5. <font face=幼圆 color=white>如果查找失败，char数组会插入到hashtable，以后就可以共享这个数组了</font>
