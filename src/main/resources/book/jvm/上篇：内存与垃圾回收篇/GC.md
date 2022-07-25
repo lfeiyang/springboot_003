@@ -113,3 +113,56 @@
 - [x]  <font face=幼圆 color=white>finalize() 方法是对象逃脱死亡的最后机会，稍后 GC 会对 F-Queue 队列中的对象进行第二次标记。如果 objA 在 finalize() 方法中与引用链上的任何一个对象建立了联系，那么在第二次标记时，objA 会被移出“即将回收”集合。之后，对象会再次出现没有引用存在的情况。在这个情况下，finalize() 方法不会被再次调用，对象会直接变成不可触及的状态，也就是说，一个对象的 finalize() 方法只会被调用一次</font>
 
 ![Finalization](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\Finalization.png)
+
+<font face=幼圆 color=yellow>JVisual VM记得以管理员身份运行,否则不支持JVM</font>
+
+
+
+### <font face=幼圆 color=white>3.3、标记清除算法、标记整理算法和复制算法比较</font>
+
+|              | Mark-Sweep | Mark-Compact | Copying |
+| ------------ | ---------- | ------------ | ------- |
+| 内存是否整齐 | 否         | 整齐         | 整齐    |
+| 空间开销     | 小         | 小           | 大      |
+| 速度         | 中等       | 慢           | 快      |
+
+
+
+### <font face=幼圆 color=white>3.4、分代收集算法 -- 最优算法</font>
+
+#### <font face=幼圆 color=white>3.4.1、对象分类</font>
+
+- <font face=幼圆 color=white>新生代：朝生夕灭的对象（例如：方法的局部变量引用的对象等）</font>
+- <font face=幼圆 color=white>老年代：存活得比较久，但还是要死的对象（例如：缓存对象、单例对象等）</font>
+- <font face=幼圆 color=white>永久代：对象生成后几乎不灭的对象（例如：加载过的类信息）</font>
+
+
+
+#### <font face=幼圆 color=white>3.4.2、内存区域</font>
+
+​		<font face=幼圆 color=white>**新生代和老年代都在java堆，永久代在方法区**</font>
+
+![新生代和老年代的内存比例](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\新生代和老年代的内存比例.png)
+
+
+
+#### <font face=幼圆 color=white>3.4.3、分代收集算法</font>
+
+- <font face=幼圆 color=white>年轻代（Young Gen）采用复制算法</font>
+- <font face=幼圆 color=white>老年代（Tenured Gen）采用标记-清除和标记-整理的混合实现</font>
+  1. <font face=幼圆 color=white>Mark阶段的开销与存活对象的数量成正比</font>
+  2. <font face=幼圆 color=white>Sweep阶段的开销与所管理区域的大小成正比</font>
+  3. <font face=幼圆 color=white>Compact阶段的开销与存活对象的数据成正比</font>
+
+
+
+### <font face=幼圆 color=white>3.5 增量收集算法</font>
+
+1. <font face=幼圆 color=white>在现有的收集算法中，每次垃圾回收，应用程序都会处于一种Stop the World的状态，这种状态下，应用程序会被挂起，暂停一切正常的工作。这样一来，将严重影响用户体验或者系统稳定性</font>
+2. <font face=幼圆 color=white>基本思想：如果一次性将所有的垃圾进行处理，需要造成系统长时间的停顿，那么就可以让垃圾收集线程和应用程序线程交替进行。每次，垃圾回收线程只收集一小片区域的内存空间，接着切换到用户线程继续执行。依次反复，知道垃圾收集完成</font>
+
+<font face=幼圆 color=red>造成系统吞吐量的下降</font>
+
+
+
+## <font face=幼圆 color=white>四、垃圾回收相关概念</font>
