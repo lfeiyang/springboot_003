@@ -166,3 +166,29 @@
 
 
 ## <font face=幼圆 color=white>四、垃圾回收相关概念</font>
+
+### <font face=幼圆 color=white>4.1、stop the world</font>
+
+1. <font face=幼圆 color=white>分析工作必须在一个能确保一致性的快照中进行</font>
+2. <font face=幼圆 color=white>一致性指整个分析期间整个执行系统看起来像被冻结在某个时间点上</font>
+3. <font face=幼圆 color=white>如果出现分析过程中对象引用关系还在不断变化，则分析结果的准确性无法保证</font>
+4. <font face=幼圆 color=white>被STW中断的应用程序线程会在完成GC之后恢复，频繁中断会让用户感觉像是网速不快造成卡带一样，所以我们需要减少STW的发生</font>
+5. <font face=幼圆 color=white>STW和采用哪款GC无关，所有的GC都有这个事件</font>
+6. <font face=幼圆 color=white>哪怕是G1也不能完全避免Stop-The-World情况的发生，只能说垃圾回收器越来越优秀，回收效率越来越高，尽可能地缩短了暂停时间</font>
+7. <font face=幼圆 color=white>STW是JVM在后台自动发起和自动完成的。在用户不可见的情况下，把用户正常工作的线程全部停掉</font>
+8. <font face=幼圆 color=white>开发中不要用System.gc(),会导致Stop-The-World的发生</font>
+
+
+
+### <font face=幼圆 color=white>4.2、并行与并发</font>
+
+1. <font face=幼圆 color=white>并发：指的是多个事情，在同一时间段内同时发生了</font>
+2. <font face=幼圆 color=white>并行：指的是多个事情，在同一时间点上同时发生了</font>
+3. <font face=幼圆 color=white>并发的多个任务之间是互相抢占资源的</font>
+4. <font face=幼圆 color=white>并行的多个任务之间是不互相抢占资源的</font>
+5. <font face=幼圆 color=white>只有在多 CPU 或者一个 CPU 多核的情况中，才会发生并行</font>
+6. <font face=幼圆 color=white>否则，看似同时发生的事情，其实都是并发执行的</font>
+
+
+
+### <font face=幼圆 color=white>4.3、安全点与安全区域</font>
