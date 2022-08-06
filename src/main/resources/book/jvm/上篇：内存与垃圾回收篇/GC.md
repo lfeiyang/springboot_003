@@ -422,3 +422,56 @@
 
 - <font face=幼圆 color=white>G1 GC的吞吐量目标是90%的应用程序时间和10%的垃圾回收时间</font>
 - <font face=幼圆 color=white>评估G1 GC的吞吐量时，暂停时间目标不要太严苛。目标太过严苛表示你愿意承受更多的垃圾回收开销，而这些会直接影响到吞吐量。</font>
+
+
+
+#### <font face=幼圆 color=white>5.3.2、CMS</font>
+
+##### <font face=幼圆 color=white>5.3.2.1、什么是CMS?</font>
+
+1. <font face=幼圆 color=white>**在JDK 1.5时期，HotSpot推出了一款在强交互应用中几乎可认为有划时代意义的垃圾收集器: CMS (Concurrent -Mark- Sweep)收集器，这款收集器是HotSpot虚拟机中第一款真正意义. 上的并发收集器，它第一次实现了让垃圾收集线程与用户线程同时工作。**</font>
+2. <font face=幼圆 color=white>**CMS收集器的关注点是尽可能缩短垃圾收集时用户线程的停顿时间。停顿时间越短(低延迟)就越适合与用户交互的程序，良好的响应速度能提升用户体验。**目前很大一部分的Java应用集中在互联网站或者B/S系统的服务端上，这类应用尤其重视服务的响应速度，希望系统停顿时间最短，以给用户带来较好的体验。CMS收集器就非常符合这类应用的需求。 </font>
+3. <font face=幼圆 color=white>**CMS的垃圾收集算法采用标记-清除算法，并且也会"Stop-the-world"**</font>
+
+##### <font face=幼圆 color=white>5.3.2.2、回收阶段</font>
+
+1. <font face=幼圆 color=white>初始标记(Initial-Mark) 阶段:在这个阶段中，程序中所有的工作线程都将会因为“Stop-the-World”机制而出现短暂的暂停，这个阶段的主要任务<font face=幼圆 color=red>**仅仅只是标记出GCRoots能直接关联到的对象。\**一旦标记完成之后就会恢复之前被暂停的所有应用线程。由于直接关联对象比较小，所以这里的速度非常快。**</font></font>
+2. <font face=幼圆 color=white>并发标记(Concurrent-Mark) 阶段:<font face=幼圆 color=orange>从GC Roots的直接关联对象开始遍历整个对象图的过程</font>，这个过程耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行。</font>
+3. <font face=幼圆 color=white>重新标记(Remark)阶段:由于在并发标记阶段中，程序的工作线程会和垃圾收集线程同时运行或者交叉运行，因此<font face=幼圆 color=yellow>为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那-部分对象的标记记录</font>，这个阶段的停顿时间通常会比初始标记阶段稍长一些，但也远比并发标记阶段的时间短</font>
+4. <font face=幼圆 color=white>并发清除(Concurrent-Sweep)阶段:<font face=幼圆 color=green>**此阶段清理删除掉标记阶段判断的已经死亡的对象，释放内存空间**</font>。由于不需要移动存活对象，所以这个阶段也是可以与用户线程同时并发的</font>
+
+![CMS](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\CMS.png)
+
+##### <font face=幼圆 color=white>5.3.2.3、**CMS的优点**</font>
+
+1. <font face=幼圆 color=white>并发收集</font>
+2. <font face=幼圆 color=white>低延迟</font>
+
+##### <font face=幼圆 color=white>5.3.2.4、**CMS的弊端**</font>
+
+1. <font face=幼圆 color=white>**会产生内存碎片，导致并发清除后，用户线程可用的空间不足。在无法分配大对象的情况下，不得不提前触发Full GC**</font>
+2. <font face=幼圆 color=white>**CMS收集器对CPU资源非常敏感。在并发阶段，它虽然不会导致用户停顿，但是会因为占用了一部分线程而导致应用程序变慢，总吞吐量会降低**</font>
+3. <font face=幼圆 color=white>**CMS收集器无法处理浮动垃圾。可能出现“Concurrent Mode Failure"失败而导致另一次Full GC的产生。在并发标记阶段由于程序的工作线程和垃圾收集线程是同时运行或者交叉运行的，那么在并发标记阶段如果产生新的垃圾对象，CMS将无法对这些垃圾对象进行标记，最终会导致这些新产生的垃圾对象没有被及时回收，从而只能在下一次执行GC时释放这些之前未被回收的内存空间**</font>
+
+##### <font face=幼圆 color=white>5.3.2.5、**CMS参数设置**</font>
+
+1. <font face=幼圆 color=white>**- XX: +UseConcMarkSweepGC** **手动指定使用CMS收集器执行内存回收任务**</font>
+   - <font face=幼圆 color=red>**开启该参数后会自动将-XX: +UseParNewGC打开。即: ParNew (Young区用) +CMS (0ld区用) +Serial 0ld的组合。**</font>
+
+2. <font face=幼圆 color=white>**-XX:CMSlnitiatingOccupanyFraction设置堆内存使用率的阈值，一旦达到该阈值，便开始进行回收**</font>
+   - <font face=幼圆 color=red>**JDK5及以前版本的默认值为68,即当老年代的空间使用率达到68%时，会执行一次CMS回收。JDK6及以上版本默认值为92%**</font>
+   - <font face=幼圆 color=white>如果内存增长缓慢，则可以设置一个稍大的值，大的阈值可以有效降低CMS的触发频率，减少老年代回收的次数可以较为明显地改善应用程序性能。反之，如果应用程序内存使用率增长很快，则应该降低这个阈值，以避免频繁触发老年代串行收集器（Serial）。<font face=幼圆 color=orange>**因此通过该选项便可以有效降低Full GC的执行次数**</font></font>
+
+3. <font face=幼圆 color=white>**-xx: +UseCMSCompactAtFullCollection** 用于指定在执行完Full GC后对内存空间进行压缩整理，以此避免内存碎片的产生。不过由于内存压缩整理过程无法并发执行，所带来的问题就是停顿时间变得更长了</font>
+
+4. <font face=幼圆 color=white>**-XX: CMSFullGCsBeforeCompaction 设置在执行多少次Full GC后对内存空间进行压缩整理**</font>
+
+5. <font face=幼圆 color=white>**-xx: ParallelCMSThreads 设置CMS的线程数量**</font>
+
+   ​		<font face=幼圆 color=white>CMS默认启动的线程数是(ParallelGCThreads+3) /4,ParallelGCThreads是年轻代并行收集器的线程数。当CPU资源比较紧张时，受到CMS收集器线程的影响，应用程序的性能在垃圾回收阶段可能会非常糟糕</font>
+
+
+
+### <font face=幼圆 color=white>5.4、7种经典垃圾回收器总结</font>
+
+![7种经典的垃圾回收器](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\7种经典的垃圾回收器.png)
