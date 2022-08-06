@@ -229,3 +229,196 @@
 <font face=幼圆 color=white>-XX:+PrintcommandLineFlags：查看命令行相关参数（包含使用的垃圾收集器）</font>
 
 <font face=幼圆 color=white>使用命令行指令：jinfo -flag 相关垃圾回收器参数 进程ID</font>
+
+
+
+### <font face=幼圆 color=white>5.3、垃圾回收器</font>
+
+#### <font face=幼圆 color=white>5.3.1、G1</font>
+
+##### <font face=幼圆 color=white>5.3.1.1、什么是G1垃圾收集器?</font>
+
+1. <font face=幼圆 color=white>G1(Garbage-First)是一款面向服务端应用的垃圾收集器,主要针对配备多核CPU及大容量内存的机器,**以极高概率满足GC停顿时间的同时**,还**兼具高吞吐量的性能特征**</font>
+2. <font face=幼圆 color=white>在JDK1.7版本正式启用,是**JDK 9以后的默认垃圾收集器,取代了CMS 回收器**</font>
+
+##### <font face=幼圆 color=white>5.3.1.2、为什么名字叫Garbage First?</font>
+
+1.  <font face=幼圆 color=white>G1是一个并行回收器,它**把堆内存分割为很多不相关的区域(region物理上不连续),把堆分为2048个区域**,每一个region的大小是1 - 32M不等,必须是**2的整数次幂**。使用不同的region可以来表示Eden、幸存者0区、幸存者1区、老年代等</font>
+2. <font face=幼圆 color=white>每次根据允许的收集时间,**优先回收价值最大的Region**
+   (每次回收完以后都有一个空闲的region,在后台维护一个优先列表)</font>
+3. <font face=幼圆 color=white>由于这种方式的侧重点在于回收垃圾最大量的区间(Region),所以我们给G1一个名字:垃圾优先(Garbage First) </font>
+4. <font face=幼圆 color=white>下面说一个问题:**既然我们已经有了前面几个强大的GC,为什么还要发布Garbage First(G1)GC？**</font>
+   - <font face=幼圆 color=white>**官方给G1设定的目标是在延迟可控的情况下获得尽可能高的吞吐量,所以才担当起"全功能收集器"的重任与期望。**</font>
+
+##### <font face=幼圆 color=white>5.3.1.3、G1垃圾回收的优势与不足</font>
+
+1. <font face=幼圆 color=white>**并行和并发**</font>
+
+   - <font face=幼圆 color=white>并行性: G1在回收期间,可以有多个GC线程同时工作,有效利用多核计算能力。此时用户线程STW</font>
+
+   - <font face=幼圆 color=white>并发性: G1拥有与应用程序交替执行的能力,部分工作可以和应用程序同时执行,因此,一般来说,不会在整个回收阶段发生完全阻塞应用程序的情况</font>
+
+2. <font face=幼圆 color=white>**分代收集**</font>
+
+   - <font face=幼圆 color=white>从分代上看,**G1依然属于分代型垃圾回收器**,它会区分年轻代和老年代,年轻代依然有Eden区和Survivor区。**但从堆的结构上看,它不要求整个Eden区、年轻代或者老年代都是连续的**,也**不再坚持固定大小和固定数量**</font>
+
+   - <font face=幼圆 color=white>将堆空间分为若干个区域(Region),这些区域中包含了逻辑上的年轻代和老年代。</font>
+
+   - <font face=幼圆 color=white>和之前的各类回收器不同,它**同时兼顾年轻代和老年代**。对比其他回收器,或者工作在年轻代,或者工作在老年代</font>
+
+![G1分代收集](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\G1分代收集.png)
+
+3. <font face=幼圆 color=white>**空间整合**</font>
+   - <font face=幼圆 color=white>G1将内存划分为一个个的region。 内存的回收是**以region作为基本单位的**。Region之间是复制算法,但整体上实际可看作是**标记一压缩(Mark一Compact)算法**,两种算法都可以避免内存碎片。这种特性有利于程序长时间运行,分配大对象时不会因为无法找到连续内存空间而提前触发下一次GC。尤其是当Java堆非常大的时候,G1的优势更加明显)</font>
+
+4. <font face=幼圆 color=white>**可预测的停顿时间模型(即:软实时soft real一time)**</font>
+
+​		<font face=幼圆 color=white>这是 G1 相对于 CMS 的另一大优势,G1除了追求低停顿外,还能建立**可预测的停顿时间模型**,能让使用者明确**指定在一个长度为 M 毫秒的时间片段内,消耗在垃圾收集上的时间不得超过 N 毫秒**、可以通过参数**-XX:MaxGCPauseMillis**进行设置)</font>
+
+- <font face=幼圆 color=white>由于分区的原因,G1可以只选取部分区域进行内存回收,这样缩小了回收的范围,因此对于全局停顿情况的发生也能得到较好的控制</font>
+- <font face=幼圆 color=white>G1 跟踪各个 Region 里面的垃圾堆积的价值大小(回收所获得的空间大小以及回收所需时间的经验值),在后台维护一个优先列表,**每次根据允许的收集时间,优先回收价值最大的Region。保证了G1收集器在有限的时间内可以获取尽可能高的收集效率**</font>
+- <font face=幼圆 color=white>相比于CMS GC,G1未必能做到CMS在最好情况下的延时停顿,但是最差情况要好很多</font>
+
+##### <font face=幼圆 color=white>5.3.1.4、G1参数设置</font>
+
+1. <font face=幼圆 color=white>**-XX:+UseG1GC:**手动指定使用G1收集器执行内存回收任务（JDK9后不用设置，默认就是G1）</font>
+2. <font face=幼圆 color=white>-XX:G1HeapRegionSize:设置每个Region的大小。值是2的幂,范围是1MB到32MB之间,目标是根据最小的Java堆大小划分出约2048个区域。默认是堆内存的1/2000</font>
+3. <font face=幼圆 color=white>-XX:MaxGCPauseMillis:设置期望达到的最大GC停顿时间指标(JVM会尽力实现,但不保证达到)。默认值是200ms（如果这个值设置很小,如20ms,那么它收集的region会少,这样长时间后,堆内存会满。产生FullGC,FullGC会出现STW,反而影响用户体验)</font>
+4. <font face=幼圆 color=white>-XX:ParallelGCThread:设置STW时GC线程数的值。最多设置为8(垃圾回收线程)</font>
+5. <font face=幼圆 color=white>-XX:ConcGCThreads:设置并发标记的线程数。将n设置为并行垃圾回收线程数(ParallelGCThreads)的1/4左右</font>
+6. <font face=幼圆 color=white> **-XX:InitiatingHeapOccupancyPercent:**设置触发并发GC周期的Java堆占用率阈值。**超过此值,就触发GC**。默认值是45</font>
+
+##### <font face=幼圆 color=white>5.3.1.4、G1应用场景</font>
+
+1. <font face=幼圆 color=white><font face=幼圆 color=red>**面向服务端应用，针对具有大内存、多处理器的机器**。</font>(在普通大小的堆里表现并不惊喜)，最主要的应用是需要低GC延迟，并具有大堆的应用程序提供解决方如:在堆大小约6GB或更大时，可预测的暂停时间可以低于0.5秒; ( G1通过每次只清理一 部分而不是全部的Region的增量式清理来保证每次GC停顿时间不会过长)</font>
+
+2. <font face=幼圆 color=yellow>**用来替换掉JDK1.5中的CMS收集器**</font>
+
+    <font face=幼圆 color=white>在下面的情况时，使用G1可能比CMS好:</font>
+      <font face=幼圆 color=white> ①超过50%的Java堆被活动数据占用;</font>
+        <font face=幼圆 color=white>②对象分配频率或年代提升频率变化很大;</font>
+      <font face=幼圆 color=white> ③GC停顿时间过长(长于0.5至1秒)。</font>
+
+3. <font face=幼圆 color=white>HotSpot垃圾收集器里，除了G1以外，其他的垃圾收集器使用内置的JVM线程执行GC的多线程操作，而G1 GC可以采用应用线程承担后台运行的GC工作，即**当JVM的GC线程处理速度慢时，系统会调用应用程序线程帮助加速垃圾回收过程**</font>
+
+##### <font face=幼圆 color=white>5.3.1.5、G1的主要回收环节</font>
+
+<font face=幼圆 color=white>年轻代GC (Young GC)</font>
+
+<font face=幼圆 color=white>老年代并发标记过程 (Concurrent Marking)</font>
+
+<font face=幼圆 color=white>混合回收(Mixed GC)</font>
+
+<font face=幼圆 color=orange>(如果需要，单线程、独占式、高强度的Full GC还是继续存在的。它
+针对GC的评估失败提供了-种失败保护机制，即强力回收。)</font>
+
+![G1垃圾回收过程](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\G1垃圾回收过程.png)
+
+1. <font face=幼圆 color=white> 应用程序分配内存**,<font face=幼圆 color=red>当年轻代的Eden区用尽时开始年轻代回收过程；</font>**G1的年轻代收集阶段是一个<font face=幼圆 color=red>并行(多个垃圾线程)的独占式收集器</font>。在年轻代回收期,G1 GC暂停所有应用程序线程,启动多线程执行年轻代回收。然后<font face=幼圆 color=orange>从年轻代区间移动存活对象到Survivor区间或者老年区间,也有可能是两个区间都会涉及</font></font>
+2. <font face=幼圆 color=white>**当堆内存使用达到一定值(默认45%)时,开始老年代并发标记过程**</font>
+3. <font face=幼圆 color=white>  标记完成马上开始混合回收过程。对于一个混合回收期,G1 GC从老年区间移动存活对象到空闲区间,这些空闲区间也就成为了老年代的一部分。和年轻代不同,老年代的G1回收器和其他GC不同,<font face=幼圆 color=green>G1的老年代回收器不需要整个老年代被回收,一次只需要扫描/回收一小部分老年代的Region就可以了</font>。同时,这个<font face=幼圆 color=red>老年代Region是和年轻代一起被回收的。</font></font>
+4. <font face=幼圆 color=white> 举个例子：一个Web服务器,Java进程最大堆内存为4G,每分钟响应1500个请求,每45秒钟会新分配大约2G的内存。G1会每45秒钟进行一次年轻代回收,每31个小时整个堆的使用率会达到45%,会开始老年代并发标记过程,标记完成后开始四到五次的混合回收</font>
+
+##### <font face=幼圆 color=white>5.3.1.6、G1回收详解</font>
+
+###### <font face=幼圆 color=white>5.3.1.6.1、回收过程一：Young GC</font>
+
+<font face=幼圆 color=red>回收时机：</font>
+
+1. <font face=幼圆 color=red>当Eden空间耗尽时,G1会启动一次年轻代垃圾回收过程</font>
+
+2. <font face=幼圆 color=white>年轻代垃圾回收只会回收Eden区和Survivor区</font>
+
+3. <font face=幼圆 color=white>回收前:</font>
+
+   ![年轻代GC前](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\年轻代GC前.png)
+
+4. <font face=幼圆 color=white>回收后:</font>
+
+   ![年轻代GC后](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\年轻代GC后.png)
+
+<font face=幼圆 color=red>回收机制：</font>
+
+- [x] <font face=幼圆 color=white>**第一阶段，根扫描:**</font>
+
+  - <font face=幼圆 color=white>一定要考虑**remembered Set**,看是否有老年代中的对象引用了新生代对象</font>
+  - <font face=幼圆 color=white>根是指static变量指向的对象,正在执行的方法调用链条上的局部变量等。根引用连同RSet记录的外部引用作为扫描存活对象的入口)</font>
+
+- [x] <font face=幼圆 color=white>**第二阶段，更新RSet:**</font>
+
+  - <font face=幼圆 color=white>处理dirty card queue(见备注)中的card,更新RSet。 此阶段完成后,<font face=幼圆 color=orange>**RSet可以准确的反映老年代对所在的内存分段中对象的引用**</font></font>
+
+  ​        <font face=幼圆 color=white><font face=幼圆 color=yellow>**dirty card queue**</font>: 对于应用程序的**引用赋值语句object.field=object,JVM会在之前和之     后执行特殊的操作以在dirty card queue中入队一个保存了对象引用信息的card**。在年轻代回     收的时候,G1会对Dirty CardQueue中所有的card进行处理,以更新RSet,保证RSet实时准确的     反映引用关系。那为什么不在引用赋值语句处直接更新RSet呢？这是为了性能的需要,**RSet的     处理需要线程同步,开销会很大,使用队列性能会好很多**</font>
+
+- [x] <font face=幼圆 color=white>**第三阶段，处理RSet:**</font>
+
+  - <font face=幼圆 color=white>识别<font face=幼圆 color=red>**被老年代对象指向的Eden中的对象**</font>,这些**被指向的Eden中的对象被认为是存活的对象**</font>
+
+- [x] <font face=幼圆 color=white>**第四阶段，复制对象:**</font>
+
+  - <font face=幼圆 color=white>此阶段,对象树被遍历,Eden区 内存段中<font face=幼圆 color=red>**存活的对象**会被**复制**到**Survivor区中空的内存分段**</font>,Survivor区内存段中<font face=幼圆 color=orange>**存活的对象如果年龄未达阈值**</font>,年龄会加1,<font face=幼圆 color=yellow>**达到阀值会被会被复制到old区中空的内存分段**</font>。如果<font face=幼圆 color=green>**Survivor空间不够,Eden空间的部分数据会直接晋升到老年代空间**</font></font>
+
+- [x] <font face=幼圆 color=white>**第五阶段，处理引用:**</font>
+
+  - <font face=幼圆 color=white>处理Soft,Weak, Phantom, Final, JNI Weak等引用。**最终Eden空间的数据为空,GC停止工作,而目标内存中的对象都是连续存储的,没有碎片,所以复制过程可以达到内存整理的效果,减少碎片**</font>
+
+
+
+###### <font face=幼圆 color=white>5.3.1.6.2、回收过程二：老年代并发标记过程</font>
+
+- [x] <font face=幼圆 color=white>**一、初始标记阶段:**</font>
+
+  - <font face=幼圆 color=white>标记从根节点直接可达的对象。这个阶段是STW的,并且会触发一次年轻代GC</font>
+- [x] <font face=幼圆 color=white>**二、根区域扫描(Root Region Scanning):** </font>
+
+  - <font face=幼圆 color=white>G1 GC扫描Survivor区**直接可达的老年代区域对象,**并标记被引用的对象。**这一过程必须在young GC之前完成**(YoungGC时,会动Survivor区,所以这一过程必须在young GC之前完成)</font>
+- [x] <font face=幼圆 color=white>**三、并发标记(Concurrent Marking):**</font>
+
+  - <font face=幼圆 color=white>在整个堆中进行并发标记(和应用程序并发执行),此过程可能被young GC中断。在并发标记阶段,<font face=幼圆 color=red>**若发现区域对象中的所有对象都是垃圾,那这个区域会被立即回收**</font>。同时,<font face=幼圆 color=orange>**并发标记过程中,会计算每个区域的对象活性**</font>(区域中**存活对象的比例**)。</font>
+- [x] <font face=幼圆 color=white>**四、再次标记(Remark):**</font>
+- <font face=幼圆 color=white>由于应用程序持续进行,需要修正上一次的标记结果。**是STW的**。G1中采用了比CMS更快的初始快照算法:snapshot一at一the一beginning (SATB).</font>
+- [x] <font face=幼圆 color=white>**五、独占清理(cleanup,STW):**</font>
+
+  - <font face=幼圆 color=white>计算各个区域的存活对象和GC回收比例,并进行排序,识别可以混合回收的区域。为下阶段做铺垫。是STW的。(这个阶段并不会实际上去做垃圾的收集)</font>
+- [x] <font face=幼圆 color=white>**六、并发清理阶段:**</font>
+  - <font face=幼圆 color=white>识别并清理完全空闲的区域</font>
+
+
+
+###### <font face=幼圆 color=white>5.3.1.6.3、回收过程三：混合回收 Mixed GC</font>
+
+​		<font face=幼圆 color=white>**Mixed GC并不是FullGC**,<font face=幼圆 color=red>**老年代的堆占有率达到参数(-XX:InitiatingHeapOccupancyPercent)设定的值则触发**</font>,回收所有的Young和部分Old(根据期望的GC停顿时间确定old区垃圾收集的优先顺序)以及大对象区,正常情况G1的垃圾收集是先做MixedGC,**主要使用复制算法**,需要把各个region中存活的对象拷贝到别的region里去,<font face=幼圆 color=orange>**拷贝过程中如果发现没有足够的空region能够承载拷贝对象就会触发一次Full GC**</font></font>
+
+![Mixed GC](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\Mixed GC.png)
+
+- <font face=幼圆 color=white>并发标记结束以后，老年代中百分百为垃圾的内存分段被回收了，部分为垃圾的内存分段被计算了出来。默认情况下，这些老年代的内存分段会分8次(可以通过-XX:G1MixedGCCountTarget设置)被回收。</font>
+
+- <font face=幼圆 color=white>混合回收的回收集(Collection Set)包括八分之一的老年代内存分段，Eden区 内存分段，Survivor区内存分段。 混合回收的算法和年轻代回收的算法完全一样，只是回收集多了老年代的内存分段。具体过程请参考上面的年轻代回收过程。</font>
+- <font face=幼圆 color=white>由于老年代中的内存分段默认分8次回收，<font face=幼圆 color=red>**G1会优先回收垃圾多的内存分段**</font>。垃圾占内存分段比例越高的，越会被先回收。并且有一个**阈值**会决定内存分段是否被回收，<font face=幼圆 color=orange>**-XX:G1MixedGCLiveThresholdPercent，默认为65%**</font>，意思是垃圾占内存分段比例要达到65%才会被回收。如果垃圾占比太低，意味着存活的对象占比高，在复制的时候会花费更多的时间。</font>
+- <font face=幼圆 color=white>混合回收并不一定 要进行8次。有一个阈值<font face=幼圆 color=yellow>**-XX :G1HeapWastePercent**,默认值为10%</font>，意思是允许整个堆内存中有10%的空间被浪费，意味着如果发现可以回收的垃圾占堆内存的比例低于10%，则不再进行混合回收。因为GC会花费很多的时间但是回收到的内存却很少。</font>
+
+
+
+###### <font face=幼圆 color=white>5.3.1.6.4、回收过程四：Full GC</font>
+
+- <font face=幼圆 color=white>G1的初衷就是要避免<font face=幼圆 color=red>**Fu1l GC**</font>的出现。但是如果上述方式不能正常工作，<font face=幼圆 color=red>**G1会停止应用程序的执行(Stop-The-World)** </font>，使用单线程的内存回收算法进行垃圾回收，性能会非常差，应用程序停顿时间会很长</font>
+- <font face=幼圆 color=white>要避免Full GC的发生，一旦发生需要进行调整。什么时候会发生Full GC呢? <font face=幼圆 color=orange>比如**堆内存太小**，**当G1在复制存活对象的时候没有空的内存分段可用，则会回退到full gc**</font>， 这种情况可以通过增大内存解决</font>
+
+- <font face=幼圆 color=red>**导致G1Full GC的原因可能有两个:** .</font>
+
+   <font face=幼圆 color=#38d8f0> **1. 回收的时候没有足够的to-space来存放晋升的对象**</font>
+   <font face=幼圆 color=#38d8f0> **2. 并发处理过程没完成空间就耗尽了**</font>
+
+
+
+##### <font face=幼圆 color=white>5.3.1.7、G1回收器优化建议</font>
+
+<font face=幼圆 color=white>**①.年轻代大小**</font>
+
+- <font face=幼圆 color=white>避免使用-Xmn或-Xx :NeyvRatio等相关选项显式设置年轻代大小</font>
+- <font face=幼圆 color=white>固定年轻代的大小会覆盖暂停时间目标</font>
+
+<font face=幼圆 color=white>**②.暂停时间目标不要太过严苛**</font>
+
+- <font face=幼圆 color=white>G1 GC的吞吐量目标是90%的应用程序时间和10%的垃圾回收时间</font>
+- <font face=幼圆 color=white>评估G1 GC的吞吐量时，暂停时间目标不要太严苛。目标太过严苛表示你愿意承受更多的垃圾回收开销，而这些会直接影响到吞吐量。</font>
