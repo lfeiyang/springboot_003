@@ -192,3 +192,40 @@
 
 
 ### <font face=幼圆 color=white>4.3、安全点与安全区域</font>
+
+
+
+### <font face=幼圆 color=white>4.4、强引用、软引用、弱引用和虚引用</font>
+
+| 引用类型 | 被垃圾回收时间 | 用途               | 生存时间           |
+| -------- | -------------- | ------------------ | ------------------ |
+| 强引用   | 从来不会       | 对象的一般状态     | JVM 停止运行时终止 |
+| 软引用   | 当内存不足时   | 对象缓存           | 内存不足时终止     |
+| 弱引用   | 正常垃圾回收时 | 对象缓存           | 垃圾回收后终止     |
+| 虚引用   | 正常垃圾回收时 | 跟踪对象的垃圾回收 | 垃圾回收后终止     |
+
+
+
+## <font face=幼圆 color=white>五、垃圾收集器</font>
+
+### <font face=幼圆 color=white>5.1、垃圾收集器组合关系</font>
+
+![垃圾收集器组合关系](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\垃圾收集器组合关系.png)
+
+1. <font face=幼圆 color=white>两个收集器间有连线，表明它们可以搭配使用（7中搭配）：Serial/Serial old、Serial/CMS、ParNew/Serial old、ParNew/CMS、Parallel Scavenge/Serial 0ld、Parallel Scavenge/Parallel 01d、G1</font>
+2. <font face=幼圆 color=white>其中 Serial old 作为 CMS出现 "Concurrent Mode Failure" 失败的后备预案。</font>
+3. <font face=幼圆 color=white>红色虚线：由于维护和兼容性测试的成本，在 JDK 8 时将 Serial + CMS、ParNew + Serial old 这两个组合声明为废弃（JEP173），并在 JDK9 中完全取消了这些组合的支持（JEP214），即：移除。</font>
+4. <font face=幼圆 color=white>绿色虚线：JDK14 中：弃用 Parallel Scavenge 和 Serialold GC 组合（JEP366）。</font>
+5. <font face=幼圆 color=white>青色虚线：JDK14 中：删除 CMS 垃圾回收器（JEP363）。</font>
+
+​		<font face=幼圆 color=white>为什么要有如此之多的收集器，一个不够吗？因为 Java 的使用场景很多，移动端，服务器等。所以就需要针对不同的场景，提供不同的垃圾收集器，提高垃圾收集的性能</font>
+
+​		<font face=幼圆 color=white>对各个收集器进行比较，并没有一种放之四海皆准、任何场景下都适用的完美收集器存在，更加没有万能的收集器。所以我们选择的只是对具体应用最合适的收集器</font>
+
+
+
+### <font face=幼圆 color=white>5.2、如何查看默认垃圾收集器</font>
+
+<font face=幼圆 color=white>-XX:+PrintcommandLineFlags：查看命令行相关参数（包含使用的垃圾收集器）</font>
+
+<font face=幼圆 color=white>使用命令行指令：jinfo -flag 相关垃圾回收器参数 进程ID</font>
