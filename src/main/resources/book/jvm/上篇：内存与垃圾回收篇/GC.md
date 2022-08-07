@@ -435,7 +435,7 @@
 
 ##### <font face=幼圆 color=white>5.3.2.2、回收阶段</font>
 
-1. <font face=幼圆 color=white>初始标记(Initial-Mark) 阶段:在这个阶段中，程序中所有的工作线程都将会因为“Stop-the-World”机制而出现短暂的暂停，这个阶段的主要任务<font face=幼圆 color=red>**仅仅只是标记出GCRoots能直接关联到的对象。\**一旦标记完成之后就会恢复之前被暂停的所有应用线程。由于直接关联对象比较小，所以这里的速度非常快。**</font></font>
+1. <font face=幼圆 color=white>初始标记(Initial-Mark) 阶段:在这个阶段中，程序中所有的工作线程都将会因为“Stop-the-World”机制而出现短暂的暂停，这个阶段的主要任务<font face=幼圆 color=red>**仅仅只是标记出GCRoots能直接关联到的对象。一旦标记完成之后就会恢复之前被暂停的所有应用线程。由于直接关联对象比较小，所以这里的速度非常快。**</font></font>
 2. <font face=幼圆 color=white>并发标记(Concurrent-Mark) 阶段:<font face=幼圆 color=orange>从GC Roots的直接关联对象开始遍历整个对象图的过程</font>，这个过程耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行。</font>
 3. <font face=幼圆 color=white>重新标记(Remark)阶段:由于在并发标记阶段中，程序的工作线程会和垃圾收集线程同时运行或者交叉运行，因此<font face=幼圆 color=yellow>为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那-部分对象的标记记录</font>，这个阶段的停顿时间通常会比初始标记阶段稍长一些，但也远比并发标记阶段的时间短</font>
 4. <font face=幼圆 color=white>并发清除(Concurrent-Sweep)阶段:<font face=幼圆 color=green>**此阶段清理删除掉标记阶段判断的已经死亡的对象，释放内存空间**</font>。由于不需要移动存活对象，所以这个阶段也是可以与用户线程同时并发的</font>
@@ -472,6 +472,92 @@
 
 
 
+#### <font face=幼圆 color=white>5.3.3、Parallel Scavenge</font>
+
+1. <font face=幼圆 color=white> **HotSpot的年轻代中除了拥有ParNew收集器是基于<font face=幼圆 color=yellow>并行</font>回收的以外，Parallel Scavenge收集器同样也采用了<font face=幼圆 color=red>复制算法</font>、并行回收和"<font face=幼圆 color=orange>Stopthe World</font>"机制。**</font>
+
+2. <font face=幼圆 color=white>**那么Parallel收集器的出现是否多此一举?**</font>
+
+   -    <font face=幼圆 color=white>**和ParNew收集器不同，Parallel Scavenge收集器的目标则是达到一个可控制的吞吐量(Throughput) ，它也被称为<font face=幼圆 color=purple>吞吐量优先</font>的垃圾收集器**</font>
+
+
+   -    <font face=幼圆 color=white>**自适应调节策略也是Parallel Scavenge与ParNew一个重要区别。**</font>
+
+
+
+3. <font face=幼圆 color=white>**高吞吐量则可以高效率地利用CPU时间尽快完成程序的运算任务，主要适合在后台运算而不需要太多交互的任务。因此，常见在服务器环境中使用。例如，那些执行批量处理、订单处理、工资支付、科学计算的应用程序。**</font>
+
+4. <font face=幼圆 color=white>**Parallel收集器在JDK1.6时提供了用于执行老年代垃圾收集的Parallel 0ld收集器，用来代替老年代的Serial 0ld收集器。**</font>
+
+5. <font face=幼圆 color=white>**Parallel 0ld收集器采用了标记-压缩算法，但同样也是基于并行回收和"Stop- the-world"机制。**</font>
+
+6. <font face=幼圆 color=white>在程序吞吐量优先的应用场景中，Parallel 收集器和Parallel 0ld收集器的组合，在Server模式下的内存回收性能很不错。<font face=幼圆 color=green>在Java8中，默认是此垃圾收集器。</font></font>
+
+##### <font face=幼圆 color=white>5.3.3.1、**Parallel参数设置**</font>
+
+1. <font face=幼圆 color=white>**-xx:+UseParallelGC手动指定年轻代使用Parallel并行收集器执行内存回收任务**</font>
+
+2. <font face=幼圆 color=white>**-xx: +UseParallelolaGC手动指定老年代都是使用并行回收收集器**</font>
+
+   - 
+        <font face=幼圆 color=white>分别适用于新生代和老年代。默认jdk8是开启的</font>
+
+
+   -    <font face=幼圆 color=white>上面两个参数，默认开启一个，另一个也会被开启。(<font face=幼圆 color=cherry>互相激活</font>)</font>
+
+3. <font face=幼圆 color=white>**-xx: ParallelGCThreads设置年轻代并行收集器的线程数。一般地，最好CPU数量相等，以避免过多的线程数影响垃圾收集性能**</font>
+
+   - <font face=幼圆 color=white>在默认情况下，当CPU数量小于8个， ParallelGCThreads 的值等于CPU数量</font>
+
+   - <font face=幼圆 color=white>当CPU数量大于8个，ParallelGCThreads 的值等于3+ [5*CPU_ Count] /8]</font>
+
+
+4. <font face=幼圆 color=white>**-xx: +UseAdaptiveSizePolicy设置Parallel Scavenge收集器具有自适应调节策略**</font>
+
+   -  <font face=幼圆 color=white>**在这种模式下，年轻代的大小、Eden和Survivor的比例、晋升老年代的对象年龄等参数会被自动调整，已达到在堆大小、吞吐量和停顿时间之间的平衡点。**</font>
+
+
+   -  <font face=幼圆 color=white>**在手动调优比较困难的场合，可以直接使用这种自适应的方式，仅指定虚拟机的最大堆、目标的吞吐量(GCTimeRatio)和停顿时(MaxGCPauseMills)，让虚拟机自己完成调优工作。**</font>
+
+
+
+
+#### <font face=幼圆 color=white>5.3.4、ParalNew</font>
+
+1. <font face=幼圆 color=white>**如果说Serial GC是年轻代中的单线程垃圾收集器，那么ParNew收集器则是Serial收集器的多线程版本。Par是Parallel的缩写，New:只能处理的是新生代。**</font>
+2. <font face=幼圆 color=white>**ParNew收集器除了采用并行回收的方式执行内存回收外，与Serial垃圾收集器之间几乎没有任何区别。ParNew收集器在年轻代中同样也是采用复制算法，"Stop-the-World"机制。**</font>
+3. <font face=幼圆 color=white>**ParNew是很多JVM运行在Server模式下新生代的默认垃圾收集器。**</font>
+
+![ParalNew](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\ParalNew.png)
+
+
+
+#### <font face=幼圆 color=white>5.3.5、Serial</font>
+
+1. <font face=幼圆 color=white>**Serial收集器是最基本、历史最悠久的垃圾收集器了。JDK1.3之前回收新生代唯一的选择。**</font>
+
+2. <font face=幼圆 color=white>**Serial收集器作为Hotspot中Client模式下的默认新生代垃圾收集器。**</font>
+
+3. <font face=幼圆 color=white>**Serial收集器采用复制算法、串行回收和"Stop-the-World"机制的方式执行内存回收。**</font>
+
+   - <font face=幼圆 color=white>**Serial 0ld是运行在Client模式下默认的老年代的垃圾回收器**</font>
+
+   - <font face=幼圆 color=white>**Serial 0ld在Server模式下主要有两个用途:①与新生代的Parallel Scavenge配合使用； ②作为老年代CMS收集器的后备垃圾收集方案**</font>
+
+   ![Serial](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\Serial.png)
+
+4. <font face=幼圆 color=white>**优势:简单而高效(与其他收集器的单线程比)**</font>
+
+   ​		<font face=幼圆 color=white>对于限定单个CPU的环境来说，Serial收集器由于没有线程交互的开销，专心做垃圾收集自然可以获得最高的单线程收集效率。运行在Client模式下的虚拟机是个不错的选择</font>
+
+5. <font face=幼圆 color=white>**在HotSpot虚拟机中，使用-XX:+UseSerialGC 参数可以指定年轻代和老年代都使用串行收集器**。**等价于新生代用Serial GC，且老年代用Serial 0ld GC**</font>
+
+6. <font face=幼圆 color=white>**总结**</font>
+
+​		<font face=幼圆 color=white>**这种垃圾收集器大家了解，现在已经不用串行的了。而且在限定单核cpu才可以用。现在都不是单核的了。对于交互较强的应用而言，这种垃圾收集器是不能接受的。一般在Java web应用程序中是不会采用串行垃圾收集器的。**</font>
+
+
+
 ### <font face=幼圆 color=white>5.4、7种经典垃圾回收器总结</font>
 
-![7种经典的垃圾回收器](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\7种经典的垃圾回收器.png)
+### ![7种经典的垃圾回收器](D:\project\springboot_003\src\main\resources\book\jvm\上篇：内存与垃圾回收篇\image\7种经典的垃圾回收器.png)

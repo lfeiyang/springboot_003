@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * 查看默认垃圾收集器
+ * -XX:+PrintCommandLineFlags -XX:+UseConcMarkSweepGC
  *
  * @author lfeiyang
  * @since 2022-07-27 23:08
