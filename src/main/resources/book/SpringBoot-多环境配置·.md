@@ -64,6 +64,18 @@ spring.profiles.active=@profiles.active@
 ### <font face=幼圆 color=white>1.3、资源过滤</font>
 
 ```java
+<!--根据激活条件引入打包所需的配置和文件-->
+<resource>
+	    <directory>src/main/resources</directory>
+	    <!--引入所需环境的配置文件-->
+	    <filtering>true</filtering>
+	    <includes>
+	        <include>application.properties</include>
+	        <!--根据maven选择环境导入配置文件-->
+	        <include>application-${profiles.active}.properties</include>
+	    </includes>
+	</resource>
+</resources>
 ```
 
 
