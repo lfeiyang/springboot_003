@@ -122,6 +122,12 @@ public class DataSourceConfig
     public DataSource dsOne() {
         return DruidDataSourceBuilder.create().build();
     }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.two")
+    public DataSource dsTwo() {
+        return DruidDataSourceBuilder.create().build();
+    }
 }
 ```
 
@@ -150,7 +156,7 @@ import javax.sql.DataSource;
  * @since 2022-10-04 22:21
  */
 @Configuration
-@MapperScan(value = "com.lfeiyang.mapper", sqlSessionFactoryRef = "sqlSessionFactoryBeanOne")
+@MapperScan(value = "com.lfeiyang.mapper1", sqlSessionFactoryRef = "sqlSessionFactoryBeanOne")
 public class MybatisConfigOne
 {
     @Autowired
