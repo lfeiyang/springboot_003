@@ -174,3 +174,10 @@ public class FrameUserRedisThread implements Runnable {
 }
 ```
 
+## <font face=幼圆 color=white>四、FAQ</font>
+
+```text
+1.自定义多线程配置时taskExecutor是默认多线程名，自定义多线程配置不能起这个名字，否则还是调用默认applicationTaskExecutor执行器
+2.自定义多线程配置可以叫asyncExecutor
+备注：这个是个坑！！！
+```

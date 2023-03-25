@@ -17,7 +17,7 @@ import java.util.Map;
 @Component
 // 监听的队列名称 TestDirectQueue
 @RabbitListener(queues = "DirectQueue")
-public class DirectReceiver {
+public class    DirectReceiver {
     @RabbitHandler
     public void process(Map<?, ?> testMessage) {
         log.info("DirectReceiver消费者收到消息  : " + testMessage.toString());

@@ -84,7 +84,74 @@ chown -R elastic:elastic {{espath}} 或 chown -R elastic {{espath}}
 chmod -R 777 {{espath}}
 ```
 
-#### <font face=幼圆 color=white>1.1.4.启动</font>
+##### <font face=幼圆 color=white>1.1.3.4.Elasticsearch创建安全账户</font>
+
+```shell
+# 1.在es节点上启用安全功能
+# 在es配置路径/elasticsearch-7.17.1/config下的elasticsearch.yml添加如下两行
+[sandwich@centos-elk config]$ tail -n 2 elasticsearch.yml
+xpack.security.enabled: true
+discovery.type: single-node
+
+# 2.为内置用户创建密码
+# es内置用户用于特定的管理目的：apm_system，beats_system，elastic，kibana，logstash_system 和 remote_monitoring_user。
+# 在使用它们之前，我们必须为它们设置密码。在 Elasticsearch 的目录里安装打入如下的命令：
+[sandwich@centos-elk bin]$ ./elasticsearch-setup-passwords interactive
+Initiating the setup of passwords for reserved users elastic,apm_system,kibana,kibana_system,logstash_system,beats_system,remote_monitoring_user.
+You will be prompted to enter passwords as the process progresses.
+Please confirm that you would like to continue [y/N]y
+
+
+Enter password for [elastic]: 
+Reenter password for [elastic]: 
+Enter password for [apm_system]: 
+Reenter password for [apm_system]: 
+Enter password for [kibana_system]: 
+Reenter password for [kibana_system]: 
+Enter password for [logstash_system]: 
+Reenter password for [logstash_system]: 
+Enter password for [beats_system]: 
+Reenter password for [beats_system]: 
+Enter password for [remote_monitoring_user]: 
+Reenter password for [remote_monitoring_user]: 
+Changed password for user [apm_system]
+Changed password for user [kibana_system]
+Changed password for user [kibana]
+Changed password for user [logstash_system]
+Changed password for user [beats_system]
+Changed password for user [remote_monitoring_user]
+Changed password for user [elastic]
+
+# 3.查看内置用户和权限
+{{host}}/_security/user
+```
+
+
+
+#### <font face=幼圆 color=white>1.1.4.配置JDK</font>
+
+```shell
+# elasticsearch-env配置文件
+# use elasticsearch jdk
+ES_JAVA_HOME="/usr/lib/jvm/java-11-openjdk-11.0.18.0.10-1.el7_9.x86_64"
+
+# 多JDK安装
+# 安装jdk11
+sudo yum install java-11-openjdk -y
+
+# alternatives命令显示已安装jdk版本列表
+alternatives --config java
+
+# 若提示alternatives找不到则执行以下命令
+update-alternatives --config java
+
+# 若仍然没有变化则可能是因为原本就配置了环境变量的原因
+# 前往 /etc/profile 中 找到配置jdk环境变量的地方，全部注释
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/4fec0073387e4b60a23e9a8d1de42f85.png)
+
+#### <font face=幼圆 color=white>1.1.5.启动</font>
 
 ```shell
 # /opt/elasticsearch-8.2.0/bin
@@ -113,6 +180,27 @@ server.port: 5601
 server.host: "0.0.0.0" 
 # The URLs of the Elasticsearch instances to use for all your queries.
 elasticsearch.hosts: ["http://192.168.58.100:9200"]
+```
+
+### <font face=幼圆 color=white>2.3.账户</font>
+
+```shell
+# 为Kibana添加内置用户
+# 明文
+[sandwich@centos-elk config]$ tail -n 2 kibana.yml 
+elasticsearch.username: "kibana"
+elasticsearch.password: "123456"
+
+# 加密
+[sandwich@centos-elk bin]$ ./kibana-keystore create
+Created Kibana keystore in /home/sandwich/app/elk/kibana-7.17.1-linux-x86_64/config/kibana.keystore
+[sandwich@centos-elk bin]$ ./kibana-keystore add elasticsearch.username
+Enter value for elasticsearch.username: ******
+[sandwich@centos-elk bin]$ ./kibana-keystore add elasticsearch.password
+Enter value for elasticsearch.password: ******
+
+# url添加
+./bin/kibana --elasticsearch.hosts="http://localhost:9200" --elasticsearch.username=kibana --elasticsearch.password=123456
 ```
 
 

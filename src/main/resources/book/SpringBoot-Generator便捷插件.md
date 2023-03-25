@@ -131,3 +131,8 @@ mapper.Mapper = tk.mybatis.mapper.common.Mapper
 
 
 ## <font face=幼圆 color=white>五、FAQ</font>
+```text
+1.别用高版本，不兼容，缺方法
+
+2.
+```
